@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>662</width>
-    <height>367</height>
+    <width>902</width>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,25 +20,92 @@
       <x>30</x>
       <y>10</y>
       <width>521</width>
-      <height>291</height>
+      <height>501</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="voxelGridButton">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
+   <widget class="Line" name="line">
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>30</y>
-      <width>93</width>
-      <height>28</height>
+      <y>0</y>
+      <width>20</width>
+      <height>741</height>
      </rect>
     </property>
-    <property name="text">
-     <string>点云下采样</string>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>10</y>
+      <width>97</width>
+      <height>218</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>点云处理:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="voxelGridButton_2">
+         <property name="text">
+          <string>下采样滤波</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="passThroughButton">
+         <property name="text">
+          <string>直通滤波</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="statisticalOutlierRemovalButton">
+         <property name="text">
+          <string>统计滤波</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -46,7 +113,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>662</width>
+     <width>902</width>
      <height>26</height>
     </rect>
    </property>
@@ -70,6 +137,16 @@
   <action name="actionOpen">
    <property name="text">
     <string>open</string>
+   </property>
+  </action>
+  <action name="voxelGridButton">
+   <property name="text">
+    <string>下采样</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>test</string>
    </property>
   </action>
  </widget>
