@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
-    <height>583</height>
+    <width>864</width>
+    <height>588</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
       <x>560</x>
       <y>0</y>
       <width>20</width>
-      <height>741</height>
+      <height>521</height>
      </rect>
     </property>
     <property name="orientation">
@@ -40,8 +40,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>581</x>
-      <y>11</y>
+      <x>582</x>
+      <y>10</y>
       <width>68</width>
       <height>16</height>
      </rect>
@@ -53,21 +53,25 @@
    <widget class="QPushButton" name="voxelGridButton_2">
     <property name="geometry">
      <rect>
-      <x>580</x>
+      <x>590</x>
       <y>240</y>
-      <width>93</width>
-      <height>28</height>
+      <width>41</width>
+      <height>101</height>
      </rect>
     </property>
     <property name="text">
-     <string>下采样滤波</string>
+     <string>下
+采
+样
+滤
+波</string>
     </property>
    </widget>
    <widget class="QPushButton" name="statisticalOutlierRemovalButton">
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>270</y>
+      <y>370</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -76,26 +80,65 @@
      <string>统计滤波</string>
     </property>
    </widget>
-   <widget class="Line" name="line_2">
+   <widget class="Line" name="line_4">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>150</y>
-      <width>311</width>
-      <height>16</height>
+      <x>0</x>
+      <y>510</y>
+      <width>571</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>0</y>
+      <width>20</width>
+      <height>521</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
    <widget class="Line" name="line_3">
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>30</y>
-      <width>301</width>
-      <height>16</height>
+      <y>220</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_5">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>100</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_6">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>510</y>
+      <width>291</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="orientation">
@@ -106,8 +149,8 @@
     <property name="geometry">
      <rect>
       <x>581</x>
-      <y>51</y>
-      <width>269</width>
+      <y>120</y>
+      <width>262</width>
       <height>96</height>
      </rect>
     </property>
@@ -208,13 +251,146 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>582</x>
+      <y>42</y>
+      <width>261</width>
+      <height>55</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>处理前数据量:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="pointNumBefore"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>处理后数据量:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="pointNumAfter"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="saveAsPCD">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>10</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>保存为PCD</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line_7">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>340</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>240</y>
+      <width>201</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>体素块大小</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>260</y>
+      <width>171</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>长度:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="leafLength"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>宽度:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="leafWidth"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>高度:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="leafHeight"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
+     <width>864</width>
      <height>26</height>
     </rect>
    </property>

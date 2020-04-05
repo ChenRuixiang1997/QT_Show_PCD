@@ -40,8 +40,10 @@ private:
 	Ui::QT_Show_PCDClass ui;
 
 	//创建公共对象
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;//用于可视化					  
+	pcl::PCDWriter writer;//写出点云
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_save_ptr;//用于保存点云
 	//初始化组件
 	void initialVtkWidget();
 protected:
@@ -54,6 +56,24 @@ protected:
 	//直通滤波上限
 	QString limitMax;//接收值
 	float limit_max;//转换运算值
+	//下采样体素长度
+	QString leafLength;//接收值
+	float leaf_length;//转换运算值
+	 //下采样体素宽度
+	QString leafWidth;//接收值
+	float leaf_width;//转换运算值
+	 //下采样体素高度
+	QString leafHeight;//接收值
+	float leaf_height;//转换运算值
+	//输出点云数量所需
+	int numberBeforeFilter;
+	int numberAfterFilter;
+	std::string numberBeforeFilterStr;
+	std::string numberAfterFilterStr;
+	QString qstr;
+	//保存点云所需
+	QString saveFileName;
+	std::string saveFileNameStr;
 	//声明槽函数
 private slots:
 	//打开文件
@@ -75,4 +95,6 @@ private slots:
 	void onStatisticalOutlierRemoval();
 	//分割程序声明
 	void cylinder_segmentation();
+	//保存PCD格式点云声明
+	void onSave();
 };

@@ -28,6 +28,8 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	//统计滤波
 	connect(ui.statisticalOutlierRemovalButton, SIGNAL(clicked()), this, SLOT(onStatisticalOutlierRemoval()));
 	//connect(ui.statisticalOutlierRemovalButton, SIGNAL(clicked()), this, SLOT(cylinder_segmentation()));
+	//点云保存
+	connect(ui.saveAsPCD, SIGNAL(clicked()), this, SLOT(onSave()));
 }
 
 //初始化VtkWidget
@@ -38,6 +40,9 @@ void QT_Show_PCD::initialVtkWidget()
 	doubleValidator->setNotation(QDoubleValidator::StandardNotation);
 	ui.editLimitMin->setValidator(doubleValidator);
 	ui.editLimitMax->setValidator(doubleValidator);
+	ui.leafLength->setValidator(doubleValidator);
+	ui.leafWidth->setValidator(doubleValidator);
+	ui.leafHeight->setValidator(doubleValidator);
 	//初始化点云
 	cloud.reset(new pcl::PointCloud<pcl::PointXYZ>);
 	//设置默认滤波方式为保留
@@ -100,79 +105,57 @@ void QT_Show_PCD::onOpen()
 //点云下采样
 void QT_Show_PCD::onVelx()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose The PointCloud TO VoxelGridFilter", ".", "Open PCD files(*.pcd)");
-	if (!fileName.isEmpty())
-	{
-		//打开文件，获取文件名
-		std::string file_name = fileName.toStdString();
-
-		// 定义　点云对象　指针
-		pcl::PCLPointCloud2::Ptr cloud2_ptr(new pcl::PCLPointCloud2());//滤波前点云对象指针
-		pcl::PCLPointCloud2::Ptr cloud2_filtered_ptr(new pcl::PCLPointCloud2());//滤波后点云对象指针
-
-		//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//不知道干啥的
-
-		// 读取点云文件　填充点云对象
-		pcl::PCDReader reader;
-		reader.read(file_name, *cloud2_ptr);
-		if (cloud2_ptr == NULL) {
-			QMessageBox::warning(this, "error", "open file failure!");
-			return;
-		}
-
-		// 创建滤波器对象　Create the filtering object
-		pcl::VoxelGrid<pcl::PCLPointCloud2> vg;
-		// pcl::ApproximateVoxelGrid<pcl::PointXYZ> avg;
-		vg.setInputCloud(cloud2_ptr);//设置输入点云
-		vg.setLeafSize(0.01f, 0.01f, 0.01f);//　体素块大小　１cm
-		vg.filter(*cloud2_filtered_ptr);//点云输出到指针*cloud2_filtered_ptr
-		// 写入内存
-		pcl::PCDWriter writer;
-		file_name.insert(file_name.find("."), "_VoxelGridFilter");
-		
-		writer.write(file_name, *cloud2_filtered_ptr,
-			Eigen::Vector4f::Zero(), Eigen::Quaternionf::Identity(), false);
-		//----------------------------------点云下采样完成-----------------------------------
-
-		//创建新的点云对象用于显示
-		pcl::PCLPointCloud2 cloud2;
-		Eigen::Vector4f origin;
-		Eigen::Quaternionf orientation;
-		int pcd_version;
-		int data_type;
-		unsigned int data_idx;
-		int offset = 0;
-		//创建PCD读取对象
-		pcl::PCDReader rd;
-		//读取PCD头信息
-		rd.readHeader(file_name, cloud2, origin, orientation, pcd_version, data_type, data_idx);
-		//参数说明:data_type数据类型（0 = ASCII，1 =二进制，2 =二进制压缩）
-		if (data_type == 0)
-		{
-			pcl::io::loadPCDFile(file_name , *cloud);
-		}
-		else if (data_type == 2)
-		{
-			pcl::PCDReader reader1;
-			reader1.read<pcl::PointXYZ>(file_name , *cloud);
-		}
-		//刷新显示
-		viewer->updatePointCloud(cloud, "cloud");
-		viewer->resetCamera();
-		ui.qvtkWidget->update();
-		// 输出滤波后的点云信息
-		int numberBeforeFilter = cloud2_ptr->width * cloud2_ptr->height;
-		int numberAfterFilter = cloud2_filtered_ptr->width * cloud2_filtered_ptr->height;
-		if (numberAfterFilter != 0) 
-		{
-			std::string numberAfterFilterStr = std::to_string(numberAfterFilter);
-			std::string numberBeforeFilterStr = std::to_string(numberBeforeFilter);
-			std::string information = "下采样滤波前数量:"+ numberBeforeFilterStr +".\n下采样滤波后数量:" + numberAfterFilterStr+".";
-			QString qstr = QString::fromStdString(information);
-			QMessageBox::information(this, "滤波前后数量:", qstr);
-			return;
-		}
+	// 定义　点云对象　指针
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波前点云对象指针
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波后点云对象指针
+	cloud2_ptr = cloud;
+	if (cloud2_ptr->width * cloud2_ptr->height == 0) {
+		QMessageBox::warning(this, "错误:", "当前点云大小为零!");
+		return;
 	}
+	//设置滤波体素大小
+	leafLength = ui.leafLength->text();
+	leafWidth = ui.leafWidth->text();
+	leafHeight = ui.leafHeight->text();
+	if (leafLength.isEmpty()||leafWidth.isEmpty()||leafHeight.isEmpty()) 
+	{
+		QMessageBox::warning(this, "错误:", "请设置过滤体素大小!");
+		return;
+	}
+	leaf_length = leafLength.toFloat();
+	leaf_width = leafWidth.toFloat();
+	leaf_height = leafHeight.toFloat();
+	// 创建滤波器对象
+	pcl::VoxelGrid<pcl::PointXYZ> vg;
+	// pcl::ApproximateVoxelGrid<pcl::PointXYZ> avg;
+	vg.setInputCloud(cloud2_ptr);//设置输入点云
+	vg.setLeafSize(leaf_length, leaf_width, leaf_height);//　体素块大小　１cm
+	vg.filter(*cloud2_filtered_ptr);//点云输出到指针*cloud2_filtered_ptr
+	if (cloud2_filtered_ptr == NULL)
+	{
+		QMessageBox::warning(this, "错误:", "输出数据为空!");
+		return;
+	}
+	// 输出滤波后的点云信息
+	numberBeforeFilter = cloud2_ptr->width * cloud2_ptr->height;
+	numberAfterFilter = cloud2_filtered_ptr->width * cloud2_filtered_ptr->height;
+	if (numberAfterFilter != 0)
+	{
+		numberBeforeFilterStr = std::to_string(numberBeforeFilter);
+		numberAfterFilterStr = std::to_string(numberAfterFilter);
+		qstr = QString::fromStdString(numberBeforeFilterStr);
+		ui.pointNumBefore->setText(qstr);
+		qstr = QString::fromStdString(numberAfterFilterStr);
+		ui.pointNumAfter->setText(qstr);
+	}
+	//----------------------------------下采样完成-----------------------------------
+	cloud = cloud2_filtered_ptr;
+	cloud_save_ptr = cloud2_filtered_ptr;
+	//刷新显示
+	viewer->updatePointCloud(cloud, "cloud");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	QMessageBox::information(this, "信息:", "滤波成功!");
 }
 
 //设置直通滤波轴向
@@ -196,6 +179,14 @@ void QT_Show_PCD::setFilterNegative()
 //直通滤波
 void QT_Show_PCD::onPassThrough()
 {
+	// 定义　点云对象　指针
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波前点云对象指针
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波后点云对象指针
+	cloud2_ptr = cloud;
+	if (cloud2_ptr->width * cloud2_ptr->height == 0) {
+		QMessageBox::warning(this, "错误:", "当前点云大小为零!");
+		return;
+	}
 	//设定滤波坐标轴
 	if (passThoughAxis.empty())
 	{
@@ -220,61 +211,40 @@ void QT_Show_PCD::onPassThrough()
 			return;
 		}
 	}
-	//打开文件，获取文件名
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose The PointCloud TO VoxelGridFilter", ".", "Open PCD files(*.pcd)");
-	if (!fileName.isEmpty())
+	
+
+	// 创建滤波器对象
+	pcl::PassThrough<pcl::PointXYZ> pass;
+	pass.setInputCloud(cloud2_ptr);//设置输入点云
+	pass.setFilterFieldName(passThoughAxis);// 定义轴
+	pass.setFilterLimits(limit_min, limit_max);//　范围
+	pass.setFilterLimitsNegative(setPassThoughNagative);//标志为false时保留范围内的点
+	pass.filter(*cloud2_filtered_ptr); //输出点云
+	if (cloud2_filtered_ptr == NULL)
 	{
-		std::string file_name = fileName.toStdString();
-
-		// 定义　点云对象　指针
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波前点云对象指针
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波后点云对象指针
-
-		// 读取点云文件　填充点云对象
-		pcl::PCDReader reader;
-		reader.read(file_name, *cloud2_ptr);
-		if (cloud2_ptr == NULL) {
-			QMessageBox::warning(this, "error", "open file failure!");
-			return;
-		}
-
-		// 创建滤波器对象　Create the filtering object
-		pcl::PassThrough<pcl::PointXYZ> pass;
-		pass.setInputCloud(cloud2_ptr);//设置输入点云
-		pass.setFilterFieldName(passThoughAxis);// 定义轴
-		pass.setFilterLimits(limit_min, limit_max);//　范围
-		 // pass.setKeepOrganized(true); // 保持 有序点云结构===============
-		pass.setFilterLimitsNegative(setPassThoughNagative);//标志为false时保留范围内的点
-		pass.filter(*cloud2_filtered_ptr); //输出点云
-		if (cloud2_filtered_ptr == NULL)
-		{
-			QMessageBox::information(this, "错误:", "输出数据为空!");
-			return;
-		}
-		// 写入内存
-		pcl::PCDWriter writer;
-		file_name.insert(file_name.find("."), "_PassThroughFilter");
-
-		writer.write(file_name, *cloud2_filtered_ptr, false);
-		//----------------------------------直通滤波完成-----------------------------------
-
-		//刷新显示
-		viewer->updatePointCloud(cloud2_filtered_ptr, "cloud");
-		viewer->resetCamera();
-		ui.qvtkWidget->update();
-		// 输出滤波后的点云信息
-		int numberBeforeFilter = cloud2_ptr->width * cloud2_ptr->height;
-		int numberAfterFilter = cloud2_filtered_ptr->width * cloud2_filtered_ptr->height;
-		if (numberAfterFilter != 0)
-		{
-			std::string numberAfterFilterStr = std::to_string(numberAfterFilter);
-			std::string numberBeforeFilterStr = std::to_string(numberBeforeFilter);
-			std::string information = "直通滤波前数量:" + numberBeforeFilterStr + ".\n直通滤波后数量:" + numberAfterFilterStr + ".";
-			QString qstr = QString::fromStdString(information);
-			QMessageBox::information(this, "滤波前后数量:", qstr);
-			return;
-		}
+		QMessageBox::warning(this, "错误:", "输出数据为空!");
+		return;
 	}
+	// 输出滤波后的点云信息
+	numberBeforeFilter = cloud2_ptr->width * cloud2_ptr->height;
+	numberAfterFilter = cloud2_filtered_ptr->width * cloud2_filtered_ptr->height;
+	if (numberAfterFilter != 0)
+	{
+		numberBeforeFilterStr = std::to_string(numberBeforeFilter);
+		numberAfterFilterStr = std::to_string(numberAfterFilter);
+		qstr = QString::fromStdString(numberBeforeFilterStr);
+		ui.pointNumBefore->setText(qstr);
+		qstr = QString::fromStdString(numberAfterFilterStr);
+		ui.pointNumAfter->setText(qstr);
+	}
+	//----------------------------------直通滤波完成-----------------------------------
+	cloud = cloud2_filtered_ptr;
+	cloud_save_ptr = cloud2_filtered_ptr;
+	//刷新显示
+	viewer->updatePointCloud(cloud, "cloud");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	QMessageBox::information(this, "信息:", "滤波成功!");
 }
 	
 //统计滤波器
@@ -289,7 +259,7 @@ void QT_Show_PCD::onStatisticalOutlierRemoval() {
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波前点云对象指针
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波后点云对象指针
 
-																									// 读取点云文件　填充点云对象
+		// 读取点云文件　填充点云对象
 		pcl::PCDReader reader;
 		reader.read(file_name, *cloud2_ptr);
 		if (cloud2_ptr == NULL) {
@@ -448,4 +418,23 @@ void QT_Show_PCD::cylinder_segmentation()
 			writer.write(file_name, *cloud_cylinder, false);
 		}
 	}
+}
+
+//点云保存
+void QT_Show_PCD::onSave()
+{
+	if (cloud_save_ptr == NULL) 
+	{
+		QMessageBox::warning(this, "错误:", "输出数据为空!");
+		return;
+	}
+	QString saveFileName = QFileDialog::getSaveFileName(this, "保存点云", ".", "点云文件(*.pcd)");
+	if (!saveFileName.isEmpty())
+	{
+		saveFileNameStr = saveFileName.toStdString();
+		writer.write(saveFileNameStr, *cloud_save_ptr, false);
+		QMessageBox::information(this, "信息:", "保存成功!");
+		return;
+	}
+	
 }
