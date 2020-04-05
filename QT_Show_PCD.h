@@ -36,20 +36,40 @@ class QT_Show_PCD : public QMainWindow
 
 public:
 	QT_Show_PCD(QWidget *parent = Q_NULLPTR);
-
 private:
 	Ui::QT_Show_PCDClass ui;
 
+	//创建公共对象
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+	//初始化组件
 	void initialVtkWidget();
-
+protected:
+	std::string passThoughAxis;
+	//默认保留范围内点
+	bool setPassThoughNagative;
+	//直通滤波下限
+	QString limitMin;//接收值
+	float limit_min;//转换运算值
+	//直通滤波上限
+	QString limitMax;//接收值
+	float limit_max;//转换运算值
 	//声明槽函数
-	private slots:
+private slots:
+	//打开文件
 	void onOpen();
 	//下采样函数声明
 	void onVelx();
 	//直通滤波函数声明
+	//设置滤波轴向X
+	void setAxisX();
+	//设置滤波轴向Y
+	void setAxisY();
+	//设置滤波轴向Z
+	void setAxisZ();
+	//设置反向
+	void setFilterNegative();
+	//滤波实现
 	void onPassThrough();
 	//统计滤波函数声明
 	void onStatisticalOutlierRemoval();

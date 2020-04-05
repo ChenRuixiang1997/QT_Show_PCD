@@ -13,14 +13,18 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
@@ -38,15 +42,30 @@ public:
     QWidget *centralWidget;
     QVTKWidget *qvtkWidget;
     QFrame *line;
-    QWidget *widget;
-    QVBoxLayout *verticalLayout_2;
     QLabel *label;
-    QVBoxLayout *verticalLayout;
     QPushButton *voxelGridButton_2;
-    QSpacerItem *verticalSpacer_2;
-    QPushButton *passThroughButton;
-    QSpacerItem *verticalSpacer;
     QPushButton *statisticalOutlierRemovalButton;
+    QFrame *line_2;
+    QFrame *line_3;
+    QWidget *layoutWidget;
+    QHBoxLayout *horizontalLayout_4;
+    QGroupBox *radioGroupBox;
+    QWidget *layoutWidget1;
+    QVBoxLayout *verticalLayout_3;
+    QRadioButton *setPathThroughX;
+    QRadioButton *setPathThroughY;
+    QRadioButton *setPathThroughZ;
+    QVBoxLayout *verticalLayout_2;
+    QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_2;
+    QLineEdit *editLimitMin;
+    QHBoxLayout *horizontalLayout;
+    QLabel *label_3;
+    QLineEdit *editLimitMax;
+    QHBoxLayout *horizontalLayout_3;
+    QPushButton *passThroughButton;
+    QCheckBox *checkFilterLimitsNegative;
     QMenuBar *menuBar;
     QMenu *menu;
     QToolBar *mainToolBar;
@@ -56,7 +75,7 @@ public:
     {
         if (QT_Show_PCDClass->objectName().isEmpty())
             QT_Show_PCDClass->setObjectName(QStringLiteral("QT_Show_PCDClass"));
-        QT_Show_PCDClass->resize(902, 583);
+        QT_Show_PCDClass->resize(853, 583);
         actionOpen = new QAction(QT_Show_PCDClass);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         voxelGridButton = new QAction(QT_Show_PCDClass);
@@ -73,52 +92,125 @@ public:
         line->setGeometry(QRect(560, 0, 20, 741));
         line->setFrameShape(QFrame::VLine);
         line->setFrameShadow(QFrame::Sunken);
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(580, 10, 97, 218));
-        verticalLayout_2 = new QVBoxLayout(widget);
-        verticalLayout_2->setSpacing(6);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(widget);
+        label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
+        label->setGeometry(QRect(581, 11, 68, 16));
+        voxelGridButton_2 = new QPushButton(centralWidget);
+        voxelGridButton_2->setObjectName(QStringLiteral("voxelGridButton_2"));
+        voxelGridButton_2->setGeometry(QRect(580, 240, 93, 28));
+        statisticalOutlierRemovalButton = new QPushButton(centralWidget);
+        statisticalOutlierRemovalButton->setObjectName(QStringLiteral("statisticalOutlierRemovalButton"));
+        statisticalOutlierRemovalButton->setGeometry(QRect(580, 270, 93, 28));
+        line_2 = new QFrame(centralWidget);
+        line_2->setObjectName(QStringLiteral("line_2"));
+        line_2->setGeometry(QRect(570, 150, 311, 16));
+        line_2->setFrameShape(QFrame::HLine);
+        line_2->setFrameShadow(QFrame::Sunken);
+        line_3 = new QFrame(centralWidget);
+        line_3->setObjectName(QStringLiteral("line_3"));
+        line_3->setGeometry(QRect(570, 30, 301, 16));
+        line_3->setFrameShape(QFrame::HLine);
+        line_3->setFrameShadow(QFrame::Sunken);
+        layoutWidget = new QWidget(centralWidget);
+        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
+        layoutWidget->setGeometry(QRect(581, 51, 269, 96));
+        horizontalLayout_4 = new QHBoxLayout(layoutWidget);
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
+        radioGroupBox = new QGroupBox(layoutWidget);
+        radioGroupBox->setObjectName(QStringLiteral("radioGroupBox"));
+        layoutWidget1 = new QWidget(radioGroupBox);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 22, 37, 73));
+        verticalLayout_3 = new QVBoxLayout(layoutWidget1);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+        setPathThroughX = new QRadioButton(layoutWidget1);
+        setPathThroughX->setObjectName(QStringLiteral("setPathThroughX"));
 
-        verticalLayout_2->addWidget(label);
+        verticalLayout_3->addWidget(setPathThroughX);
 
+        setPathThroughY = new QRadioButton(layoutWidget1);
+        setPathThroughY->setObjectName(QStringLiteral("setPathThroughY"));
+
+        verticalLayout_3->addWidget(setPathThroughY);
+
+        setPathThroughZ = new QRadioButton(layoutWidget1);
+        setPathThroughZ->setObjectName(QStringLiteral("setPathThroughZ"));
+
+        verticalLayout_3->addWidget(setPathThroughZ);
+
+
+        horizontalLayout_4->addWidget(radioGroupBox);
+
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        voxelGridButton_2 = new QPushButton(widget);
-        voxelGridButton_2->setObjectName(QStringLiteral("voxelGridButton_2"));
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        label_2 = new QLabel(layoutWidget);
+        label_2->setObjectName(QStringLiteral("label_2"));
 
-        verticalLayout->addWidget(voxelGridButton_2);
+        horizontalLayout_2->addWidget(label_2);
 
-        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        editLimitMin = new QLineEdit(layoutWidget);
+        editLimitMin->setObjectName(QStringLiteral("editLimitMin"));
 
-        verticalLayout->addItem(verticalSpacer_2);
+        horizontalLayout_2->addWidget(editLimitMin);
 
-        passThroughButton = new QPushButton(widget);
-        passThroughButton->setObjectName(QStringLiteral("passThroughButton"));
 
-        verticalLayout->addWidget(passThroughButton);
+        verticalLayout->addLayout(horizontalLayout_2);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        label_3 = new QLabel(layoutWidget);
+        label_3->setObjectName(QStringLiteral("label_3"));
 
-        verticalLayout->addItem(verticalSpacer);
+        horizontalLayout->addWidget(label_3);
 
-        statisticalOutlierRemovalButton = new QPushButton(widget);
-        statisticalOutlierRemovalButton->setObjectName(QStringLiteral("statisticalOutlierRemovalButton"));
+        editLimitMax = new QLineEdit(layoutWidget);
+        editLimitMax->setObjectName(QStringLiteral("editLimitMax"));
 
-        verticalLayout->addWidget(statisticalOutlierRemovalButton);
+        horizontalLayout->addWidget(editLimitMax);
+
+
+        verticalLayout->addLayout(horizontalLayout);
 
 
         verticalLayout_2->addLayout(verticalLayout);
 
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        passThroughButton = new QPushButton(layoutWidget);
+        passThroughButton->setObjectName(QStringLiteral("passThroughButton"));
+
+        horizontalLayout_3->addWidget(passThroughButton);
+
+        checkFilterLimitsNegative = new QCheckBox(layoutWidget);
+        checkFilterLimitsNegative->setObjectName(QStringLiteral("checkFilterLimitsNegative"));
+
+        horizontalLayout_3->addWidget(checkFilterLimitsNegative);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_3);
+
+
+        horizontalLayout_4->addLayout(verticalLayout_2);
+
         QT_Show_PCDClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QT_Show_PCDClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 902, 26));
+        menuBar->setGeometry(QRect(0, 0, 853, 26));
         menu = new QMenu(menuBar);
         menu->setObjectName(QStringLiteral("menu"));
         QT_Show_PCDClass->setMenuBar(menuBar);
@@ -145,8 +237,15 @@ public:
         actionTest->setText(QApplication::translate("QT_Show_PCDClass", "test", Q_NULLPTR));
         label->setText(QApplication::translate("QT_Show_PCDClass", "\347\202\271\344\272\221\345\244\204\347\220\206:", Q_NULLPTR));
         voxelGridButton_2->setText(QApplication::translate("QT_Show_PCDClass", "\344\270\213\351\207\207\346\240\267\346\273\244\346\263\242", Q_NULLPTR));
-        passThroughButton->setText(QApplication::translate("QT_Show_PCDClass", "\347\233\264\351\200\232\346\273\244\346\263\242", Q_NULLPTR));
         statisticalOutlierRemovalButton->setText(QApplication::translate("QT_Show_PCDClass", "\347\273\237\350\256\241\346\273\244\346\263\242", Q_NULLPTR));
+        radioGroupBox->setTitle(QApplication::translate("QT_Show_PCDClass", "\350\275\264\345\220\221", Q_NULLPTR));
+        setPathThroughX->setText(QApplication::translate("QT_Show_PCDClass", "X", Q_NULLPTR));
+        setPathThroughY->setText(QApplication::translate("QT_Show_PCDClass", "Y", Q_NULLPTR));
+        setPathThroughZ->setText(QApplication::translate("QT_Show_PCDClass", "Z", Q_NULLPTR));
+        label_2->setText(QApplication::translate("QT_Show_PCDClass", "\350\256\276\347\275\256\344\270\213\351\231\220", Q_NULLPTR));
+        label_3->setText(QApplication::translate("QT_Show_PCDClass", "\350\256\276\347\275\256\344\270\212\351\231\220", Q_NULLPTR));
+        passThroughButton->setText(QApplication::translate("QT_Show_PCDClass", "\347\233\264\351\200\232\346\273\244\346\263\242", Q_NULLPTR));
+        checkFilterLimitsNegative->setText(QApplication::translate("QT_Show_PCDClass", "\350\277\207\346\273\244/\344\277\235\347\225\231", Q_NULLPTR));
         menu->setTitle(QApplication::translate("QT_Show_PCDClass", "\346\226\207\344\273\266", Q_NULLPTR));
     } // retranslateUi
 
