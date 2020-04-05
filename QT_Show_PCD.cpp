@@ -43,6 +43,9 @@ void QT_Show_PCD::initialVtkWidget()
 	ui.leafLength->setValidator(doubleValidator);
 	ui.leafWidth->setValidator(doubleValidator);
 	ui.leafHeight->setValidator(doubleValidator);
+	ui.filterThreshold->setValidator(doubleValidator);
+	
+	ui.nearPointNum->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 	//初始化点云
 	cloud.reset(new pcl::PointCloud<pcl::PointXYZ>);
 	//设置默认滤波方式为保留
@@ -248,56 +251,59 @@ void QT_Show_PCD::onPassThrough()
 }
 	
 //统计滤波器
-void QT_Show_PCD::onStatisticalOutlierRemoval() {
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose The PointCloud TO VoxelGridFilter", ".", "Open PCD files(*.pcd)");
-	if (!fileName.isEmpty())
-	{
-		//打开文件，获取文件名
-		std::string file_name = fileName.toStdString();
-
-		// 定义　点云对象　指针
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波前点云对象指针
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波后点云对象指针
-
-		// 读取点云文件　填充点云对象
-		pcl::PCDReader reader;
-		reader.read(file_name, *cloud2_ptr);
-		if (cloud2_ptr == NULL) {
-			QMessageBox::warning(this, "error", "open file failure!");
-			return;
-		}
-		
-		// 创建滤波器，对每个点分析的临近点的个数设置为50 ，并将标准差的倍数设置为1  这意味着如果一
-		// 个点的距离超出了平均距离一个标准差以上，则该点被标记为离群点，并将它移除，存储起来
-		pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sta;//创建滤波器对象
-		sta.setInputCloud(cloud2_ptr);		    //设置待滤波的点云
-		sta.setMeanK(50);	     			    //设置在进行统计时考虑查询点临近点数
-		sta.setStddevMulThresh(1.0);	   		    //设置判断是否为离群点的阀值
-		sta.filter(*cloud2_filtered_ptr); 		    //存储内点
-
-		pcl::PCDWriter writer;//写出点云
-		file_name.insert(file_name.find("."), "_StatisticalOutlierRemoval");
-
-		writer.write(file_name, *cloud2_filtered_ptr, false);
-		//----------------------------------统计滤波完成-----------------------------------
-
-		//刷新显示
-		viewer->updatePointCloud(cloud2_filtered_ptr, "cloud");
-		viewer->resetCamera();
-		ui.qvtkWidget->update();
-		// 输出滤波后的点云信息
-		int numberBeforeFilter = cloud2_ptr->width * cloud2_ptr->height;
-		int numberAfterFilter = cloud2_filtered_ptr->width * cloud2_filtered_ptr->height;
-		if (numberAfterFilter != 0)
-		{
-			std::string numberAfterFilterStr = std::to_string(numberAfterFilter);
-			std::string numberBeforeFilterStr = std::to_string(numberBeforeFilter);
-			std::string information = "统计滤波前数量:" + numberBeforeFilterStr + ".\n统计滤波后数量:" + numberAfterFilterStr + ".";
-			QString qstr = QString::fromStdString(information);
-			QMessageBox::information(this, "滤波前后数量:", qstr);
-			return;
-		}
+void QT_Show_PCD::onStatisticalOutlierRemoval()
+{
+	// 定义　点云对象　指针
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波前点云对象指针
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);//滤波后点云对象指针
+	cloud2_ptr = cloud;
+	if (cloud2_ptr->width * cloud2_ptr->height == 0) {
+		QMessageBox::warning(this, "错误:", "当前点云大小为零!");
+		return;
 	}
+	//设置滤波邻域点数和阈值
+	nearPointNum = ui.nearPointNum->text();
+	filterThreshold = ui.filterThreshold->text();
+	if (nearPointNum.isEmpty() || filterThreshold.isEmpty())
+	{
+		QMessageBox::warning(this, "错误:", "请设置滤波邻域点数和阈值!");
+		return;
+	}
+	near_point_num = nearPointNum.toInt();
+	filter_threshold = filterThreshold.toFloat();
+	
+	// 创建滤波器，对每个点分析的临近点的个数设置为50 ，并将标准差的倍数设置为1  这意味着如果一
+	// 个点的距离超出了平均距离一个标准差以上，则该点被标记为离群点，并将它移除，存储起来
+	pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sta;//创建滤波器对象
+	sta.setInputCloud(cloud2_ptr);		    //设置待滤波的点云
+	sta.setMeanK(near_point_num);	     			    //设置在进行统计时考虑查询点临近点数
+	sta.setStddevMulThresh(filter_threshold);	   		    //设置判断是否为离群点的阀值
+	sta.filter(*cloud2_filtered_ptr); 		    //存储内点
+	if (cloud2_filtered_ptr == NULL)
+	{
+		QMessageBox::warning(this, "错误:", "输出数据为空!");
+		return;
+	}
+	// 输出滤波后的点云信息
+	numberBeforeFilter = cloud2_ptr->width * cloud2_ptr->height;
+	numberAfterFilter = cloud2_filtered_ptr->width * cloud2_filtered_ptr->height;
+	if (numberAfterFilter != 0)
+	{
+		numberBeforeFilterStr = std::to_string(numberBeforeFilter);
+		numberAfterFilterStr = std::to_string(numberAfterFilter);
+		qstr = QString::fromStdString(numberBeforeFilterStr);
+		ui.pointNumBefore->setText(qstr);
+		qstr = QString::fromStdString(numberAfterFilterStr);
+		ui.pointNumAfter->setText(qstr);
+	}
+	//----------------------------------统计滤波完成-----------------------------------
+	cloud = cloud2_filtered_ptr;
+	cloud_save_ptr = cloud2_filtered_ptr;
+	//刷新显示
+	viewer->updatePointCloud(cloud, "cloud");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	QMessageBox::information(this, "信息:", "滤波成功!");
 }
 
 //点云分割
@@ -411,8 +417,6 @@ void QT_Show_PCD::cylinder_segmentation()
 		}	
 		else
 		{
-			//std::cerr << "PointCloud representing the cylindrical component: " << cloud_cylinder->points.size() << " data points." << std::endl;
-			//QMessageBox::information(this, "信息:", "表示柱形组件的点云个数:"+ cloud_cylinder->points.size());
 			file_name.erase(file_name.find(".") - 6);
 			file_name.append("_cylinder.pcd");
 			writer.write(file_name, *cloud_cylinder, false);

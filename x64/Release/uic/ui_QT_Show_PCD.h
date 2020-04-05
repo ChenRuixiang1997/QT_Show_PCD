@@ -44,7 +44,6 @@ public:
     QFrame *line;
     QLabel *label;
     QPushButton *voxelGridButton_2;
-    QPushButton *statisticalOutlierRemovalButton;
     QFrame *line_4;
     QFrame *line_2;
     QFrame *line_3;
@@ -80,7 +79,7 @@ public:
     QPushButton *saveAsPCD;
     QFrame *line_7;
     QGroupBox *groupBox;
-    QWidget *widget;
+    QWidget *layoutWidget3;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_7;
     QLabel *label_6;
@@ -91,6 +90,16 @@ public:
     QHBoxLayout *horizontalLayout_9;
     QLabel *label_7;
     QLineEdit *leafHeight;
+    QWidget *widget;
+    QHBoxLayout *horizontalLayout_12;
+    QPushButton *statisticalOutlierRemovalButton;
+    QVBoxLayout *verticalLayout_6;
+    QHBoxLayout *horizontalLayout_10;
+    QLabel *label_9;
+    QLineEdit *nearPointNum;
+    QHBoxLayout *horizontalLayout_11;
+    QLabel *label_10;
+    QLineEdit *filterThreshold;
     QMenuBar *menuBar;
     QMenu *menu;
     QToolBar *mainToolBar;
@@ -123,9 +132,6 @@ public:
         voxelGridButton_2 = new QPushButton(centralWidget);
         voxelGridButton_2->setObjectName(QStringLiteral("voxelGridButton_2"));
         voxelGridButton_2->setGeometry(QRect(590, 240, 41, 101));
-        statisticalOutlierRemovalButton = new QPushButton(centralWidget);
-        statisticalOutlierRemovalButton->setObjectName(QStringLiteral("statisticalOutlierRemovalButton"));
-        statisticalOutlierRemovalButton->setGeometry(QRect(580, 370, 93, 28));
         line_4 = new QFrame(centralWidget);
         line_4->setObjectName(QStringLiteral("line_4"));
         line_4->setGeometry(QRect(0, 510, 571, 20));
@@ -298,10 +304,10 @@ public:
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setGeometry(QRect(640, 240, 201, 101));
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(660, 260, 171, 71));
-        verticalLayout_5 = new QVBoxLayout(widget);
+        layoutWidget3 = new QWidget(centralWidget);
+        layoutWidget3->setObjectName(QStringLiteral("layoutWidget3"));
+        layoutWidget3->setGeometry(QRect(660, 260, 181, 85));
+        verticalLayout_5 = new QVBoxLayout(layoutWidget3);
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setContentsMargins(11, 11, 11, 11);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
@@ -309,12 +315,12 @@ public:
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
-        label_6 = new QLabel(widget);
+        label_6 = new QLabel(layoutWidget3);
         label_6->setObjectName(QStringLiteral("label_6"));
 
         horizontalLayout_7->addWidget(label_6);
 
-        leafLength = new QLineEdit(widget);
+        leafLength = new QLineEdit(layoutWidget3);
         leafLength->setObjectName(QStringLiteral("leafLength"));
 
         horizontalLayout_7->addWidget(leafLength);
@@ -325,12 +331,12 @@ public:
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setSpacing(6);
         horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
-        label_8 = new QLabel(widget);
+        label_8 = new QLabel(layoutWidget3);
         label_8->setObjectName(QStringLiteral("label_8"));
 
         horizontalLayout_8->addWidget(label_8);
 
-        leafWidth = new QLineEdit(widget);
+        leafWidth = new QLineEdit(layoutWidget3);
         leafWidth->setObjectName(QStringLiteral("leafWidth"));
 
         horizontalLayout_8->addWidget(leafWidth);
@@ -341,18 +347,69 @@ public:
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setSpacing(6);
         horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
-        label_7 = new QLabel(widget);
+        label_7 = new QLabel(layoutWidget3);
         label_7->setObjectName(QStringLiteral("label_7"));
 
         horizontalLayout_9->addWidget(label_7);
 
-        leafHeight = new QLineEdit(widget);
+        leafHeight = new QLineEdit(layoutWidget3);
         leafHeight->setObjectName(QStringLiteral("leafHeight"));
 
         horizontalLayout_9->addWidget(leafHeight);
 
 
         verticalLayout_5->addLayout(horizontalLayout_9);
+
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(580, 360, 261, 57));
+        horizontalLayout_12 = new QHBoxLayout(widget);
+        horizontalLayout_12->setSpacing(6);
+        horizontalLayout_12->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_12->setObjectName(QStringLiteral("horizontalLayout_12"));
+        horizontalLayout_12->setContentsMargins(0, 0, 0, 0);
+        statisticalOutlierRemovalButton = new QPushButton(widget);
+        statisticalOutlierRemovalButton->setObjectName(QStringLiteral("statisticalOutlierRemovalButton"));
+
+        horizontalLayout_12->addWidget(statisticalOutlierRemovalButton);
+
+        verticalLayout_6 = new QVBoxLayout();
+        verticalLayout_6->setSpacing(6);
+        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setSpacing(6);
+        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
+        label_9 = new QLabel(widget);
+        label_9->setObjectName(QStringLiteral("label_9"));
+
+        horizontalLayout_10->addWidget(label_9);
+
+        nearPointNum = new QLineEdit(widget);
+        nearPointNum->setObjectName(QStringLiteral("nearPointNum"));
+
+        horizontalLayout_10->addWidget(nearPointNum);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_10);
+
+        horizontalLayout_11 = new QHBoxLayout();
+        horizontalLayout_11->setSpacing(6);
+        horizontalLayout_11->setObjectName(QStringLiteral("horizontalLayout_11"));
+        label_10 = new QLabel(widget);
+        label_10->setObjectName(QStringLiteral("label_10"));
+
+        horizontalLayout_11->addWidget(label_10);
+
+        filterThreshold = new QLineEdit(widget);
+        filterThreshold->setObjectName(QStringLiteral("filterThreshold"));
+
+        horizontalLayout_11->addWidget(filterThreshold);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_11);
+
+
+        horizontalLayout_12->addLayout(verticalLayout_6);
 
         QT_Show_PCDClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QT_Show_PCDClass);
@@ -388,7 +445,6 @@ public:
 "\346\240\267\n"
 "\346\273\244\n"
 "\346\263\242", Q_NULLPTR));
-        statisticalOutlierRemovalButton->setText(QApplication::translate("QT_Show_PCDClass", "\347\273\237\350\256\241\346\273\244\346\263\242", Q_NULLPTR));
         radioGroupBox->setTitle(QApplication::translate("QT_Show_PCDClass", "\350\275\264\345\220\221", Q_NULLPTR));
         setPathThroughX->setText(QApplication::translate("QT_Show_PCDClass", "X", Q_NULLPTR));
         setPathThroughY->setText(QApplication::translate("QT_Show_PCDClass", "Y", Q_NULLPTR));
@@ -404,6 +460,10 @@ public:
         label_6->setText(QApplication::translate("QT_Show_PCDClass", "\351\225\277\345\272\246:", Q_NULLPTR));
         label_8->setText(QApplication::translate("QT_Show_PCDClass", "\345\256\275\345\272\246:", Q_NULLPTR));
         label_7->setText(QApplication::translate("QT_Show_PCDClass", "\351\253\230\345\272\246:", Q_NULLPTR));
+        statisticalOutlierRemovalButton->setText(QApplication::translate("QT_Show_PCDClass", "\347\273\237\350\256\241\n"
+"\346\273\244\346\263\242", Q_NULLPTR));
+        label_9->setText(QApplication::translate("QT_Show_PCDClass", "\351\202\273\345\237\237\347\202\271\346\225\260:", Q_NULLPTR));
+        label_10->setText(QApplication::translate("QT_Show_PCDClass", "\346\273\244\346\263\242\351\230\210\345\200\274:", Q_NULLPTR));
         menu->setTitle(QApplication::translate("QT_Show_PCDClass", "\346\226\207\344\273\266", Q_NULLPTR));
     } // retranslateUi
 

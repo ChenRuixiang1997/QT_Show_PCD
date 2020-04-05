@@ -65,6 +65,12 @@ protected:
 	 //下采样体素高度
 	QString leafHeight;//接收值
 	float leaf_height;//转换运算值
+	//统计滤波临近点数
+	QString nearPointNum;//接收值
+	float near_point_num;//转换运算值
+	 //统计滤波离群点阈值
+	QString filterThreshold;//接收值
+	float filter_threshold;//转换运算值
 	//输出点云数量所需
 	int numberBeforeFilter;
 	int numberAfterFilter;
