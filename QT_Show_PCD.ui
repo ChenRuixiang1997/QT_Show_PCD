@@ -86,7 +86,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -437,7 +437,7 @@
         <x>10</x>
         <y>11</y>
         <width>251</width>
-        <height>351</height>
+        <height>332</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -614,50 +614,98 @@
         <x>10</x>
         <y>10</y>
         <width>261</width>
-        <height>201</height>
+        <height>231</height>
        </rect>
       </property>
       <property name="title">
        <string>平面分割</string>
       </property>
-      <widget class="QPushButton" name="showOriginalPointCloud">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>140</x>
-         <y>90</y>
-         <width>101</width>
-         <height>28</height>
+         <x>10</x>
+         <y>20</y>
+         <width>241</width>
+         <height>91</height>
         </rect>
        </property>
-       <property name="text">
-        <string>显示原点云</string>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <item>
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>法线距离权重:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="normalDistanceWeight"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_22">
+          <item>
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>分割距离阈值:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="distanceThreshold"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_23">
+          <item>
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>最大迭代次数:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="maxIterations"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
-      <widget class="QPushButton" name="getPlane">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>140</x>
+         <x>10</x>
          <y>120</y>
-         <width>101</width>
-         <height>28</height>
+         <width>241</width>
+         <height>101</height>
         </rect>
        </property>
-       <property name="text">
-        <string>分割取得平面</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="removePlane">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>150</y>
-         <width>101</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>分割去除平面</string>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_14">
+        <item>
+         <widget class="QPushButton" name="showOriginalPointCloud">
+          <property name="text">
+           <string>显示原点云</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="getPlane">
+          <property name="text">
+           <string>分割取得平面</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removePlane">
+          <property name="text">
+           <string>分割去除平面</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

@@ -46,7 +46,12 @@ private:
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_save_ptr;//用于保存点云
 	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;//正态估计
 	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals;//法线显示
-
+	pcl::SACSegmentationFromNormals<pcl::PointXYZ, pcl::Normal> seg;//点云分割对象
+	pcl::ModelCoefficients::Ptr coefficients_plane;//平面分割得到的平面系数
+	pcl::PointIndices::Ptr inliers_plane;//平面分割得到的平面内联
+	pcl::ExtractIndices<pcl::PointXYZ> extract;//萃取指数
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane;//平面点云
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_plane;//去除平面得到的点云
 	//初始化组件
 	void initialVtkWidget();
 protected:
@@ -98,7 +103,12 @@ protected:
 	float coordinateSystemZ;
 	QString QCoordinateSystemViewPort;//坐标系视点
 	int coordinateSystemViewPort;
-
+	QString QNormalDistanceWeight;//平面分割中法线距离权重
+	double normalDistanceWeight;
+	QString QMaxIterations;//平面分割最大迭代次数
+	int maxIterations;
+	QString QDistanceThreshold;//距离阈值
+	double distanceThreshold;
 	//声明槽函数
 private slots:
 	//打开文件
@@ -132,4 +142,6 @@ private slots:
 	void showOriginalPointCloud();
 	//分割得到平面并显示
 	void getPlane();
+	//分割得到平面并显示
+	void removePlane();
 };

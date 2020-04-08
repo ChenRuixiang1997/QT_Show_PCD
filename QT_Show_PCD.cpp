@@ -38,13 +38,17 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	connect(ui.saveAsPCD, SIGNAL(clicked()), this, SLOT(onSave()));
 	//显示分割前点云
 	connect(ui.showOriginalPointCloud, SIGNAL(clicked()), this, SLOT(showOriginalPointCloud()));
+	//分割得到平面点云并显示
+	connect(ui.getPlane, SIGNAL(clicked()), this, SLOT(getPlane()));
+	//分割去除平面点云并显示
+	connect(ui.removePlane, SIGNAL(clicked()), this, SLOT(removePlane()));
 }
 
 //初始化VtkWidget
 void QT_Show_PCD::initialVtkWidget()
 {
 	//指定输入框输入为double类型数据
-	QDoubleValidator *doubleValidator = new QDoubleValidator(-9999, 9999, 6, this);
+	QDoubleValidator *doubleValidator = new QDoubleValidator(-999999999, 999999999, 9, this);
 	doubleValidator->setNotation(QDoubleValidator::StandardNotation);
 	ui.editLimitMin->setValidator(doubleValidator);
 	ui.editLimitMax->setValidator(doubleValidator);
@@ -53,18 +57,25 @@ void QT_Show_PCD::initialVtkWidget()
 	ui.leafHeight->setValidator(doubleValidator);
 	ui.filterThreshold->setValidator(doubleValidator);
 	ui.normalScale->setValidator(doubleValidator);
-	ui.coordinateSystemScale->setValidator(doubleValidator);
 	ui.coordinateSystemX->setValidator(doubleValidator);
 	ui.coordinateSystemY->setValidator(doubleValidator);
 	ui.coordinateSystemZ->setValidator(doubleValidator);
+	ui.normalDistanceWeight->setValidator(doubleValidator);
+	ui.distanceThreshold->setValidator(doubleValidator);
 
 	ui.nearPointNum->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));//指定输入框输入整数
 	ui.normalLevel->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 	ui.kSearch->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 	ui.coordinateSystemViewPort->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
+	ui.coordinateSystemScale->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
+	ui.maxIterations->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 	//初始化点云
-	cloud.reset(new pcl::PointCloud<pcl::PointXYZ>);
-	cloud_normals.reset(new pcl::PointCloud<pcl::Normal>);
+	cloud.reset(new pcl::PointCloud<pcl::PointXYZ>);//初始点云
+	cloud_normals.reset(new pcl::PointCloud<pcl::Normal>);//法线
+	coefficients_plane.reset(new pcl::ModelCoefficients);//平面系数
+	inliers_plane.reset(new pcl::PointIndices);//平面内联
+	cloud_plane.reset(new pcl::PointCloud<pcl::PointXYZ>());//平面点云
+	cloud_without_plane.reset(new pcl::PointCloud<pcl::PointXYZ>());//去除平面的点云
 	//设置默认滤波方式为保留
 	setPassThoughNagative = false;
 	//默认未打开坐标系
@@ -85,6 +96,10 @@ void QT_Show_PCD::initialVtkWidget()
 	normal_level = 10;
 	normal_scale = 0.05;//法线长度0.05米
 	k_search = 50;//指定附近邻域点数量为50
+	//平面分割参数初始化
+	normalDistanceWeight = 0.1;//法线距离权重
+	maxIterations = 100;//最大迭代次数
+	distanceThreshold = 0.03;//距离阈值
 	//初始化可视化窗口
 	viewer.reset(new pcl::visualization::PCLVisualizer("viewer", false));
 	viewer->addPointCloud(cloud, "cloud");
@@ -271,12 +286,12 @@ void QT_Show_PCD::onPassThrough()
 	}
 	//----------------------------------直通滤波完成-----------------------------------
 	cloud = cloud2_filtered_ptr;
-	cloud_save_ptr = cloud2_filtered_ptr;
 	//刷新显示
 	viewer->updatePointCloud(cloud, "cloud");
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
 	QMessageBox::information(this, "信息:", "滤波成功!");
+	cloud_save_ptr = cloud2_filtered_ptr;
 }
 	
 //点云下采样
@@ -327,12 +342,12 @@ void QT_Show_PCD::onVelx()
 	}
 	//----------------------------------下采样完成-----------------------------------
 	cloud = cloud2_filtered_ptr;
-	cloud_save_ptr = cloud2_filtered_ptr;
 	//刷新显示
 	viewer->updatePointCloud(cloud, "cloud");
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
 	QMessageBox::information(this, "信息:", "滤波成功!");
+	cloud_save_ptr = cloud2_filtered_ptr;
 }
 
 //统计滤波器
@@ -383,12 +398,12 @@ void QT_Show_PCD::onStatisticalOutlierRemoval()
 	}
 	//----------------------------------统计滤波完成-----------------------------------
 	cloud = cloud2_filtered_ptr;
-	cloud_save_ptr = cloud2_filtered_ptr;
 	//刷新显示
 	viewer->updatePointCloud(cloud, "cloud");
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
 	QMessageBox::information(this, "信息:", "滤波成功!");
+	cloud_save_ptr = cloud2_filtered_ptr;
 }
 
 //点云分割
@@ -409,8 +424,8 @@ void QT_Show_PCD::cylinder_segmentation()
 	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud<pcl::Normal>);//法线计算
 	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals2(new pcl::PointCloud<pcl::Normal>);//法线计算
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered2(new pcl::PointCloud<pcl::PointXYZ>);//点云过滤
-	pcl::ModelCoefficients::Ptr coefficients_plane(new pcl::ModelCoefficients), coefficients_cylinder(new pcl::ModelCoefficients);
-	pcl::PointIndices::Ptr inliers_plane(new pcl::PointIndices), inliers_cylinder(new pcl::PointIndices);
+	pcl::ModelCoefficients::Ptr coefficients_plane(new pcl::ModelCoefficients), coefficients_cylinder(new pcl::ModelCoefficients);//平面系数
+	pcl::PointIndices::Ptr inliers_plane(new pcl::PointIndices), inliers_cylinder(new pcl::PointIndices);//平面内联
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());//kd树
 	QString fileName = QFileDialog::getOpenFileName(this, "Choose The PointCloud TO VoxelGridFilter", ".", "Open PCD files(*.pcd)");
 
@@ -560,13 +575,115 @@ void QT_Show_PCD::showOriginalPointCloud()
 		QMessageBox::warning(this, "警告!", "点云大小为零！");
 		return;
 	}
-	viewer->updatePointCloud(cloud, "cloud");
+	viewer->removeAllPointClouds();
+	viewer->addPointCloud(cloud, "cloud");
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
+	cloud_save_ptr = cloud;
 }
 
 //分割得到平面并显示
 void QT_Show_PCD::getPlane()
 {
-	
+	if (!QNormalDistanceWeight.isEmpty()) 
+	{
+		normalDistanceWeight = QNormalDistanceWeight.toDouble();
+	}
+	if (!QMaxIterations.isEmpty())
+	{
+		maxIterations = QMaxIterations.toInt();
+	}
+	if (!QDistanceThreshold.isEmpty())
+	{
+		distanceThreshold = QDistanceThreshold.toDouble();
+	}
+	if(cloud_normals->empty())
+	{
+		QMessageBox::warning(this, "警告!", "请先生成法线！");
+		return;
+	}
+	// 为平面模型创建分割对象并设置所有参数
+	seg.setOptimizeCoefficients(true);//设置优化系数
+	seg.setModelType(pcl::SACMODEL_NORMAL_PLANE);//设置分割模型类别:平面分割
+	seg.setNormalDistanceWeight(normalDistanceWeight);//设置法线距离权重
+	seg.setMethodType(pcl::SAC_RANSAC);//设置用哪个随机参数估计方法
+	seg.setMaxIterations(maxIterations);//设置最大迭代次数
+	seg.setDistanceThreshold(distanceThreshold);//设置距离阈值
+	seg.setInputCloud(cloud);//设置输入点云
+	seg.setInputNormals(cloud_normals);//设置输入法线
+	// 分割得到平面内联和系数
+	seg.segment(*inliers_plane, *coefficients_plane);//前者 平面内联 ， 后者 平面系数
+
+	// 将直通滤波后点云作为输入提取平面内联线
+	extract.setInputCloud(cloud);//设置输入点云
+	extract.setIndices(inliers_plane);//设置索引
+	extract.setNegative(false);//设置是否应应用点过滤的常规条件或倒转条件。输入参数negative:false = 正常的过滤器行为（默认），true = 反向的行为。
+
+	// 将平面内联写入磁盘
+	//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
+	extract.filter(*cloud_plane);
+
+	//显示点云
+	if (cloud_plane->width * cloud_plane->height == 0) {
+		QMessageBox::warning(this, "警告!", "点云大小为零！");
+		return;
+	}
+	viewer->removeAllPointClouds();
+	viewer->addPointCloud(cloud_plane, "cloud_plane");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	cloud_save_ptr = cloud_plane;
+}
+
+//分割去除平面并显示
+void QT_Show_PCD::removePlane()
+{
+	if (!QNormalDistanceWeight.isEmpty())
+	{
+		normalDistanceWeight = QNormalDistanceWeight.toDouble();
+	}
+	if (!QMaxIterations.isEmpty())
+	{
+		maxIterations = QMaxIterations.toInt();
+	}
+	if (!QDistanceThreshold.isEmpty())
+	{
+		distanceThreshold = QDistanceThreshold.toDouble();
+	}
+	if (cloud_normals->empty())
+	{
+		QMessageBox::warning(this, "警告!", "请先生成法线！");
+		return;
+	}
+	// 为平面模型创建分割对象并设置所有参数
+	seg.setOptimizeCoefficients(true);//设置优化系数
+	seg.setModelType(pcl::SACMODEL_NORMAL_PLANE);//设置分割模型类别:平面分割
+	seg.setNormalDistanceWeight(normalDistanceWeight);//设置法线距离权重
+	seg.setMethodType(pcl::SAC_RANSAC);//设置用哪个随机参数估计方法
+	seg.setMaxIterations(maxIterations);//设置最大迭代次数
+	seg.setDistanceThreshold(distanceThreshold);//设置距离阈值
+	seg.setInputCloud(cloud);//设置输入点云
+	seg.setInputNormals(cloud_normals);//设置输入法线
+	 // 分割得到平面内联和系数
+	seg.segment(*inliers_plane, *coefficients_plane);//前者 平面内联 ， 后者 平面系数
+
+	 // 将直通滤波后点云作为输入提取平面内联线
+	extract.setInputCloud(cloud);//设置输入点云
+	extract.setIndices(inliers_plane);//设置索引
+	extract.setNegative(true);//设置是否应应用点过滤的常规条件或倒转条件。输入参数negative:false = 正常的过滤器行为（默认），true = 反向的行为。
+
+	// 将平面内联写入磁盘
+	//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_plane(new pcl::PointCloud<pcl::PointXYZ>());
+	extract.filter(*cloud_without_plane);
+
+	//显示点云
+	if (cloud_without_plane->width * cloud_without_plane->height == 0) {
+		QMessageBox::warning(this, "警告!", "点云大小为零！");
+		return;
+	}
+	viewer->removeAllPointClouds();
+	viewer->addPointCloud(cloud_without_plane, "cloud_without_plane");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	cloud_save_ptr = cloud_without_plane;
 }

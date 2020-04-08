@@ -140,6 +140,19 @@ public:
     QLineEdit *coordinateSystemViewPort;
     QWidget *tab_3;
     QGroupBox *groupBox_2;
+    QWidget *layoutWidget6;
+    QVBoxLayout *verticalLayout_13;
+    QHBoxLayout *horizontalLayout_16;
+    QLabel *label_20;
+    QLineEdit *normalDistanceWeight;
+    QHBoxLayout *horizontalLayout_22;
+    QLabel *label_21;
+    QLineEdit *distanceThreshold;
+    QHBoxLayout *horizontalLayout_23;
+    QLabel *label_22;
+    QLineEdit *maxIterations;
+    QWidget *layoutWidget7;
+    QVBoxLayout *verticalLayout_14;
     QPushButton *showOriginalPointCloud;
     QPushButton *getPlane;
     QPushButton *removePlane;
@@ -457,7 +470,7 @@ public:
         tab_2->setObjectName(QStringLiteral("tab_2"));
         layoutWidget5 = new QWidget(tab_2);
         layoutWidget5->setObjectName(QStringLiteral("layoutWidget5"));
-        layoutWidget5->setGeometry(QRect(10, 11, 251, 351));
+        layoutWidget5->setGeometry(QRect(10, 11, 251, 332));
         verticalLayout_12 = new QVBoxLayout(layoutWidget5);
         verticalLayout_12->setSpacing(6);
         verticalLayout_12->setContentsMargins(11, 11, 11, 11);
@@ -648,16 +661,86 @@ public:
         tab_3->setObjectName(QStringLiteral("tab_3"));
         groupBox_2 = new QGroupBox(tab_3);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 10, 261, 201));
-        showOriginalPointCloud = new QPushButton(groupBox_2);
+        groupBox_2->setGeometry(QRect(10, 10, 261, 231));
+        layoutWidget6 = new QWidget(groupBox_2);
+        layoutWidget6->setObjectName(QStringLiteral("layoutWidget6"));
+        layoutWidget6->setGeometry(QRect(10, 20, 241, 91));
+        verticalLayout_13 = new QVBoxLayout(layoutWidget6);
+        verticalLayout_13->setSpacing(6);
+        verticalLayout_13->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_13->setObjectName(QStringLiteral("verticalLayout_13"));
+        verticalLayout_13->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_16 = new QHBoxLayout();
+        horizontalLayout_16->setSpacing(6);
+        horizontalLayout_16->setObjectName(QStringLiteral("horizontalLayout_16"));
+        label_20 = new QLabel(layoutWidget6);
+        label_20->setObjectName(QStringLiteral("label_20"));
+
+        horizontalLayout_16->addWidget(label_20);
+
+        normalDistanceWeight = new QLineEdit(layoutWidget6);
+        normalDistanceWeight->setObjectName(QStringLiteral("normalDistanceWeight"));
+
+        horizontalLayout_16->addWidget(normalDistanceWeight);
+
+
+        verticalLayout_13->addLayout(horizontalLayout_16);
+
+        horizontalLayout_22 = new QHBoxLayout();
+        horizontalLayout_22->setSpacing(6);
+        horizontalLayout_22->setObjectName(QStringLiteral("horizontalLayout_22"));
+        label_21 = new QLabel(layoutWidget6);
+        label_21->setObjectName(QStringLiteral("label_21"));
+
+        horizontalLayout_22->addWidget(label_21);
+
+        distanceThreshold = new QLineEdit(layoutWidget6);
+        distanceThreshold->setObjectName(QStringLiteral("distanceThreshold"));
+
+        horizontalLayout_22->addWidget(distanceThreshold);
+
+
+        verticalLayout_13->addLayout(horizontalLayout_22);
+
+        horizontalLayout_23 = new QHBoxLayout();
+        horizontalLayout_23->setSpacing(6);
+        horizontalLayout_23->setObjectName(QStringLiteral("horizontalLayout_23"));
+        label_22 = new QLabel(layoutWidget6);
+        label_22->setObjectName(QStringLiteral("label_22"));
+
+        horizontalLayout_23->addWidget(label_22);
+
+        maxIterations = new QLineEdit(layoutWidget6);
+        maxIterations->setObjectName(QStringLiteral("maxIterations"));
+
+        horizontalLayout_23->addWidget(maxIterations);
+
+
+        verticalLayout_13->addLayout(horizontalLayout_23);
+
+        layoutWidget7 = new QWidget(groupBox_2);
+        layoutWidget7->setObjectName(QStringLiteral("layoutWidget7"));
+        layoutWidget7->setGeometry(QRect(10, 120, 241, 101));
+        verticalLayout_14 = new QVBoxLayout(layoutWidget7);
+        verticalLayout_14->setSpacing(6);
+        verticalLayout_14->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_14->setObjectName(QStringLiteral("verticalLayout_14"));
+        verticalLayout_14->setContentsMargins(0, 0, 0, 0);
+        showOriginalPointCloud = new QPushButton(layoutWidget7);
         showOriginalPointCloud->setObjectName(QStringLiteral("showOriginalPointCloud"));
-        showOriginalPointCloud->setGeometry(QRect(140, 90, 101, 28));
-        getPlane = new QPushButton(groupBox_2);
+
+        verticalLayout_14->addWidget(showOriginalPointCloud);
+
+        getPlane = new QPushButton(layoutWidget7);
         getPlane->setObjectName(QStringLiteral("getPlane"));
-        getPlane->setGeometry(QRect(140, 120, 101, 28));
-        removePlane = new QPushButton(groupBox_2);
+
+        verticalLayout_14->addWidget(getPlane);
+
+        removePlane = new QPushButton(layoutWidget7);
         removePlane->setObjectName(QStringLiteral("removePlane"));
-        removePlane->setGeometry(QRect(140, 150, 101, 28));
+
+        verticalLayout_14->addWidget(removePlane);
+
         tabWidget->addTab(tab_3, QString());
         QT_Show_PCDClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QT_Show_PCDClass);
@@ -678,7 +761,7 @@ public:
 
         retranslateUi(QT_Show_PCDClass);
 
-        tabWidget->setCurrentIndex(2);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(QT_Show_PCDClass);
@@ -730,6 +813,9 @@ public:
         label_19->setText(QApplication::translate("QT_Show_PCDClass", "\345\235\220\346\240\207\347\263\273\350\247\206\347\202\271:", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("QT_Show_PCDClass", "\346\263\225\347\272\277\344\270\216\345\235\220\346\240\207\347\263\273", Q_NULLPTR));
         groupBox_2->setTitle(QApplication::translate("QT_Show_PCDClass", "\345\271\263\351\235\242\345\210\206\345\211\262", Q_NULLPTR));
+        label_20->setText(QApplication::translate("QT_Show_PCDClass", "\346\263\225\347\272\277\350\267\235\347\246\273\346\235\203\351\207\215:", Q_NULLPTR));
+        label_21->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\350\267\235\347\246\273\351\230\210\345\200\274:", Q_NULLPTR));
+        label_22->setText(QApplication::translate("QT_Show_PCDClass", "\346\234\200\345\244\247\350\277\255\344\273\243\346\254\241\346\225\260:", Q_NULLPTR));
         showOriginalPointCloud->setText(QApplication::translate("QT_Show_PCDClass", "\346\230\276\347\244\272\345\216\237\347\202\271\344\272\221", Q_NULLPTR));
         getPlane->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\217\226\345\276\227\345\271\263\351\235\242", Q_NULLPTR));
         removePlane->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\216\273\351\231\244\345\271\263\351\235\242", Q_NULLPTR));
