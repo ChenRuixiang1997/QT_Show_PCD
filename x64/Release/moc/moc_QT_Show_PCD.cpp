@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_QT_Show_PCD_t {
-    QByteArrayData data[12];
-    char stringdata0[143];
+    QByteArrayData data[16];
+    char stringdata0[213];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,13 +40,19 @@ QT_MOC_LITERAL(7, 54, 17), // "setFilterNegative"
 QT_MOC_LITERAL(8, 72, 13), // "onPassThrough"
 QT_MOC_LITERAL(9, 86, 27), // "onStatisticalOutlierRemoval"
 QT_MOC_LITERAL(10, 114, 21), // "cylinder_segmentation"
-QT_MOC_LITERAL(11, 136, 6) // "onSave"
+QT_MOC_LITERAL(11, 136, 6), // "onSave"
+QT_MOC_LITERAL(12, 143, 21), // "onAddCoordinateSystem"
+QT_MOC_LITERAL(13, 165, 8), // "onNormal"
+QT_MOC_LITERAL(14, 174, 15), // "onRemoveNormals"
+QT_MOC_LITERAL(15, 190, 22) // "showOriginalPointCloud"
 
     },
     "QT_Show_PCD\0onOpen\0\0onVelx\0setAxisX\0"
     "setAxisY\0setAxisZ\0setFilterNegative\0"
     "onPassThrough\0onStatisticalOutlierRemoval\0"
-    "cylinder_segmentation\0onSave"
+    "cylinder_segmentation\0onSave\0"
+    "onAddCoordinateSystem\0onNormal\0"
+    "onRemoveNormals\0showOriginalPointCloud"
 };
 #undef QT_MOC_LITERAL
 
@@ -56,7 +62,7 @@ static const uint qt_meta_data_QT_Show_PCD[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -64,18 +70,26 @@ static const uint qt_meta_data_QT_Show_PCD[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   64,    2, 0x08 /* Private */,
-       3,    0,   65,    2, 0x08 /* Private */,
-       4,    0,   66,    2, 0x08 /* Private */,
-       5,    0,   67,    2, 0x08 /* Private */,
-       6,    0,   68,    2, 0x08 /* Private */,
-       7,    0,   69,    2, 0x08 /* Private */,
-       8,    0,   70,    2, 0x08 /* Private */,
-       9,    0,   71,    2, 0x08 /* Private */,
-      10,    0,   72,    2, 0x08 /* Private */,
-      11,    0,   73,    2, 0x08 /* Private */,
+       1,    0,   84,    2, 0x08 /* Private */,
+       3,    0,   85,    2, 0x08 /* Private */,
+       4,    0,   86,    2, 0x08 /* Private */,
+       5,    0,   87,    2, 0x08 /* Private */,
+       6,    0,   88,    2, 0x08 /* Private */,
+       7,    0,   89,    2, 0x08 /* Private */,
+       8,    0,   90,    2, 0x08 /* Private */,
+       9,    0,   91,    2, 0x08 /* Private */,
+      10,    0,   92,    2, 0x08 /* Private */,
+      11,    0,   93,    2, 0x08 /* Private */,
+      12,    0,   94,    2, 0x08 /* Private */,
+      13,    0,   95,    2, 0x08 /* Private */,
+      14,    0,   96,    2, 0x08 /* Private */,
+      15,    0,   97,    2, 0x08 /* Private */,
 
  // slots: parameters
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -106,6 +120,10 @@ void QT_Show_PCD::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 7: _t->onStatisticalOutlierRemoval(); break;
         case 8: _t->cylinder_segmentation(); break;
         case 9: _t->onSave(); break;
+        case 10: _t->onAddCoordinateSystem(); break;
+        case 11: _t->onNormal(); break;
+        case 12: _t->onRemoveNormals(); break;
+        case 13: _t->showOriginalPointCloud(); break;
         default: ;
         }
     }
@@ -137,13 +155,13 @@ int QT_Show_PCD::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 14;
     }
     return _id;
 }

@@ -40,10 +40,13 @@ private:
 	Ui::QT_Show_PCDClass ui;
 
 	//创建公共对象
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;//用于可视化					  
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;//用于可视化的点云					  
 	pcl::PCDWriter writer;//写出点云
-	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;//可视化
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_save_ptr;//用于保存点云
+	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;//正态估计
+	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals;//法线显示
+
 	//初始化组件
 	void initialVtkWidget();
 protected:
@@ -71,15 +74,31 @@ protected:
 	 //统计滤波离群点阈值
 	QString filterThreshold;//接收值
 	float filter_threshold;//转换运算值
-	//输出点云数量所需
-	int numberBeforeFilter;
+	int numberBeforeFilter;//输出点云数量所需
 	int numberAfterFilter;
 	std::string numberBeforeFilterStr;
 	std::string numberAfterFilterStr;
 	QString qstr;
-	//保存点云所需
-	QString saveFileName;
+	QString saveFileName;//保存点云所需
 	std::string saveFileNameStr;
+	bool coordinateSystemFlag;//坐标系添加/移除(true/false)标志
+	QString normalLevel;//法线生成间隔
+	int normal_level;
+	QString normalScale;//法线生成长度
+	float normal_scale;
+	QString kSearch;//法线生成临近点数量
+	int k_search;//计算法线时kd树算法搜索邻域点范围
+	QString QCoordinateSystemScale;//坐标系大小
+	float coordinateSystemScale;
+	QString QCoordinateSystemX;//坐标系原点X轴位置
+	float coordinateSystemX;
+	QString QCoordinateSystemY;//坐标系原点Y轴位置
+	float coordinateSystemY;
+	QString QCoordinateSystemZ;//坐标系原点Z轴位置
+	float coordinateSystemZ;
+	QString QCoordinateSystemViewPort;//坐标系视点
+	int coordinateSystemViewPort;
+
 	//声明槽函数
 private slots:
 	//打开文件
@@ -103,4 +122,14 @@ private slots:
 	void cylinder_segmentation();
 	//保存PCD格式点云声明
 	void onSave();
+	//添加坐标系
+	void onAddCoordinateSystem();
+	//当前点云计算法线并显示
+	void onNormal();
+	//移除法线
+	void onRemoveNormals();
+	//显示分割前点云
+	void showOriginalPointCloud();
+	//分割得到平面并显示
+	void getPlane();
 };
