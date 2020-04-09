@@ -52,6 +52,10 @@ private:
 	pcl::ExtractIndices<pcl::PointXYZ> extract;//萃取指数
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane;//平面点云
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_plane;//去除平面得到的点云
+	pcl::ModelCoefficients::Ptr coefficients_cylinder;//平面分割得到的柱面系数
+	pcl::PointIndices::Ptr inliers_cylinder;//平面分割得到的柱面内联
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cylinder;//柱面点云
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_cylinder;//去除平面得到的点云
 	//初始化组件
 	void initialVtkWidget();
 protected:
@@ -109,6 +113,10 @@ protected:
 	int maxIterations;
 	QString QDistanceThreshold;//距离阈值
 	double distanceThreshold;
+	QString QMinRadius;//柱面分割最小半径
+	double minRadius;
+	QString QMaxRadius;//柱面分割最大半径
+	double maxRadius;
 	//声明槽函数
 private slots:
 	//打开文件
@@ -144,4 +152,8 @@ private slots:
 	void getPlane();
 	//分割得到平面并显示
 	void removePlane();
+	//分割得到柱面并显示
+	void getCylinder();
+	//移除柱面并显示
+	void removeCylinder();
 };

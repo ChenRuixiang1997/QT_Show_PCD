@@ -38,10 +38,15 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	connect(ui.saveAsPCD, SIGNAL(clicked()), this, SLOT(onSave()));
 	//显示分割前点云
 	connect(ui.showOriginalPointCloud, SIGNAL(clicked()), this, SLOT(showOriginalPointCloud()));
+	connect(ui.showOriginalPointCloud2, SIGNAL(clicked()), this, SLOT(showOriginalPointCloud()));
 	//分割得到平面点云并显示
 	connect(ui.getPlane, SIGNAL(clicked()), this, SLOT(getPlane()));
 	//分割去除平面点云并显示
 	connect(ui.removePlane, SIGNAL(clicked()), this, SLOT(removePlane()));
+	//分割得到柱面点云并显示
+	connect(ui.getCylinder, SIGNAL(clicked()), this, SLOT(getCylinder()));
+	//分割去除柱面点云并显示
+	connect(ui.removeCylinder, SIGNAL(clicked()), this, SLOT(removeCylinder()));
 }
 
 //初始化VtkWidget
@@ -62,6 +67,8 @@ void QT_Show_PCD::initialVtkWidget()
 	ui.coordinateSystemZ->setValidator(doubleValidator);
 	ui.normalDistanceWeight->setValidator(doubleValidator);
 	ui.distanceThreshold->setValidator(doubleValidator);
+	ui.minRadius->setValidator(doubleValidator);
+	ui.maxRadius->setValidator(doubleValidator);
 
 	ui.nearPointNum->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));//指定输入框输入整数
 	ui.normalLevel->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
@@ -76,6 +83,10 @@ void QT_Show_PCD::initialVtkWidget()
 	inliers_plane.reset(new pcl::PointIndices);//平面内联
 	cloud_plane.reset(new pcl::PointCloud<pcl::PointXYZ>());//平面点云
 	cloud_without_plane.reset(new pcl::PointCloud<pcl::PointXYZ>());//去除平面的点云
+	coefficients_cylinder.reset(new pcl::ModelCoefficients);//柱面系数
+	inliers_cylinder.reset(new pcl::PointIndices);//柱面内联
+	cloud_cylinder.reset(new pcl::PointCloud<pcl::PointXYZ>());//柱面点云
+	cloud_without_cylinder.reset(new pcl::PointCloud<pcl::PointXYZ>());//去除平面的点云
 	//设置默认滤波方式为保留
 	setPassThoughNagative = false;
 	//默认未打开坐标系
@@ -100,6 +111,9 @@ void QT_Show_PCD::initialVtkWidget()
 	normalDistanceWeight = 0.1;//法线距离权重
 	maxIterations = 100;//最大迭代次数
 	distanceThreshold = 0.03;//距离阈值
+	//柱面分割半径范围初始化
+	minRadius = 0;
+	maxRadius = 0.1;
 	//初始化可视化窗口
 	viewer.reset(new pcl::visualization::PCLVisualizer("viewer", false));
 	viewer->addPointCloud(cloud, "cloud");
@@ -498,7 +512,7 @@ void QT_Show_PCD::cylinder_segmentation()
 		seg.setNormalDistanceWeight(0.1);
 		seg.setMaxIterations(10000);
 		seg.setDistanceThreshold(0.05);
-		seg.setRadiusLimits(0, 0.1);
+		seg.setRadiusLimits(0, 0.1);//设置半径限制
 		seg.setInputCloud(cloud_filtered2);
 		seg.setInputNormals(cloud_normals2);
 
@@ -585,7 +599,7 @@ void QT_Show_PCD::showOriginalPointCloud()
 //分割得到平面并显示
 void QT_Show_PCD::getPlane()
 {
-	if (!QNormalDistanceWeight.isEmpty()) 
+	if (!QNormalDistanceWeight.isEmpty())
 	{
 		normalDistanceWeight = QNormalDistanceWeight.toDouble();
 	}
@@ -597,9 +611,9 @@ void QT_Show_PCD::getPlane()
 	{
 		distanceThreshold = QDistanceThreshold.toDouble();
 	}
-	if(cloud_normals->empty())
+	if (cloud_normals->points.empty())
 	{
-		QMessageBox::warning(this, "警告!", "请先生成法线！");
+		QMessageBox::warning(this, "警告!", "请先生成法线!");
 		return;
 	}
 	// 为平面模型创建分割对象并设置所有参数
@@ -611,21 +625,21 @@ void QT_Show_PCD::getPlane()
 	seg.setDistanceThreshold(distanceThreshold);//设置距离阈值
 	seg.setInputCloud(cloud);//设置输入点云
 	seg.setInputNormals(cloud_normals);//设置输入法线
-	// 分割得到平面内联和系数
+									   // 分割得到平面内联和系数
 	seg.segment(*inliers_plane, *coefficients_plane);//前者 平面内联 ， 后者 平面系数
 
-	// 将直通滤波后点云作为输入提取平面内联线
+													 // 将直通滤波后点云作为输入提取平面内联线
 	extract.setInputCloud(cloud);//设置输入点云
 	extract.setIndices(inliers_plane);//设置索引
 	extract.setNegative(false);//设置是否应应用点过滤的常规条件或倒转条件。输入参数negative:false = 正常的过滤器行为（默认），true = 反向的行为。
 
-	// 将平面内联写入磁盘
-	//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
+							   // 将平面内联写入磁盘
+							   //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
 	extract.filter(*cloud_plane);
 
 	//显示点云
 	if (cloud_plane->width * cloud_plane->height == 0) {
-		QMessageBox::warning(this, "警告!", "点云大小为零！");
+		QMessageBox::warning(this, "警告!", "生成点云大小为零！");
 		return;
 	}
 	viewer->removeAllPointClouds();
@@ -650,9 +664,9 @@ void QT_Show_PCD::removePlane()
 	{
 		distanceThreshold = QDistanceThreshold.toDouble();
 	}
-	if (cloud_normals->empty())
+	if (cloud_normals->points.empty())
 	{
-		QMessageBox::warning(this, "警告!", "请先生成法线！");
+		QMessageBox::warning(this, "警告!", "请先生成法线!");
 		return;
 	}
 	// 为平面模型创建分割对象并设置所有参数
@@ -678,7 +692,7 @@ void QT_Show_PCD::removePlane()
 
 	//显示点云
 	if (cloud_without_plane->width * cloud_without_plane->height == 0) {
-		QMessageBox::warning(this, "警告!", "点云大小为零！");
+		QMessageBox::warning(this, "警告!", "生成点云大小为零！");
 		return;
 	}
 	viewer->removeAllPointClouds();
@@ -686,4 +700,120 @@ void QT_Show_PCD::removePlane()
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
 	cloud_save_ptr = cloud_without_plane;
+}
+
+//分割得到柱面
+void QT_Show_PCD::getCylinder()
+{
+	if (!QNormalDistanceWeight.isEmpty())
+	{
+		normalDistanceWeight = QNormalDistanceWeight.toDouble();
+	}
+	if (!QMaxIterations.isEmpty())
+	{
+		maxIterations = QMaxIterations.toInt();
+	}
+	if (!QDistanceThreshold.isEmpty())
+	{
+		distanceThreshold = QDistanceThreshold.toDouble();
+	}
+	if (!QMinRadius.isEmpty())
+	{
+		minRadius = QMinRadius.toDouble();
+	}
+	if (!QMaxRadius.isEmpty())
+	{
+		maxRadius = QMaxRadius.toDouble();
+	}
+	if (cloud_normals->points.empty()) 
+	{
+		QMessageBox::warning(this,"警告!","请先生成法线!");
+		return;
+	}
+	// 创建圆柱体分割的分割对象并设置所有参数
+	seg.setOptimizeCoefficients(true);
+	seg.setModelType(pcl::SACMODEL_CYLINDER);
+	seg.setMethodType(pcl::SAC_RANSAC);
+	seg.setNormalDistanceWeight(0.1);
+	seg.setMaxIterations(10000);
+	seg.setDistanceThreshold(0.05);
+	seg.setRadiusLimits(minRadius, maxRadius);//设置半径限制
+	seg.setInputCloud(cloud);
+	seg.setInputNormals(cloud_normals);
+	// 获得圆柱内腔和系数
+	seg.segment(*inliers_cylinder, *coefficients_cylinder);
+	// 将柱面内联写入磁盘
+	extract.setInputCloud(cloud);
+	extract.setIndices(inliers_cylinder);
+	extract.setNegative(false);
+	extract.filter(*cloud_cylinder);
+
+	//显示点云
+	if (cloud_cylinder->width * cloud_cylinder->height == 0) {
+		QMessageBox::warning(this, "警告!", "生成点云大小为零！");
+		return;
+	}
+	viewer->removeAllPointClouds();
+	viewer->addPointCloud(cloud_cylinder, "cloud_cylinder");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	cloud_save_ptr = cloud_cylinder;
+}
+
+//分割移除柱面
+void QT_Show_PCD::removeCylinder()
+{
+	if (!QNormalDistanceWeight.isEmpty())
+	{
+		normalDistanceWeight = QNormalDistanceWeight.toDouble();
+	}
+	if (!QMaxIterations.isEmpty())
+	{
+		maxIterations = QMaxIterations.toInt();
+	}
+	if (!QDistanceThreshold.isEmpty())
+	{
+		distanceThreshold = QDistanceThreshold.toDouble();
+	}
+	if (!QMinRadius.isEmpty())
+	{
+		minRadius = QMinRadius.toDouble();
+	}
+	if (!QMaxRadius.isEmpty())
+	{
+		maxRadius = QMaxRadius.toDouble();
+	}
+	if (cloud_normals->points.empty())
+	{
+		QMessageBox::warning(this, "警告!", "请先生成法线!");
+		return;
+	}
+	// 创建圆柱体分割的分割对象并设置所有参数
+	seg.setOptimizeCoefficients(true);
+	seg.setModelType(pcl::SACMODEL_CYLINDER);
+	seg.setMethodType(pcl::SAC_RANSAC);
+	seg.setNormalDistanceWeight(0.1);
+	seg.setMaxIterations(10000);
+	seg.setDistanceThreshold(0.05);
+	seg.setRadiusLimits(minRadius, maxRadius);//设置半径限制
+	seg.setInputCloud(cloud);
+	seg.setInputNormals(cloud_normals);
+	// 获得圆柱内腔和系数
+	seg.segment(*inliers_cylinder, *coefficients_cylinder);
+	// 将柱面内联写入磁盘
+	extract.setInputCloud(cloud);
+	extract.setIndices(inliers_cylinder);
+	extract.setNegative(true);
+	extract.filter(*cloud_without_cylinder);
+
+	//显示点云
+	if (cloud_without_cylinder->width * cloud_without_cylinder->height == 0) {
+		QMessageBox::warning(this, "警告!", "生成点云大小为零！");
+		return;
+	}
+	viewer->removeAllPointClouds();
+	viewer->addPointCloud(cloud_without_cylinder, "cloud_cylinder");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+	cloud_save_ptr = cloud_without_cylinder;
 }

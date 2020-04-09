@@ -156,6 +156,20 @@ public:
     QPushButton *showOriginalPointCloud;
     QPushButton *getPlane;
     QPushButton *removePlane;
+    QGroupBox *groupBox_3;
+    QWidget *layoutWidget8;
+    QVBoxLayout *verticalLayout_15;
+    QPushButton *showOriginalPointCloud2;
+    QPushButton *getCylinder;
+    QPushButton *removeCylinder;
+    QWidget *widget;
+    QHBoxLayout *horizontalLayout_24;
+    QLabel *label_23;
+    QLineEdit *minRadius;
+    QWidget *widget1;
+    QHBoxLayout *horizontalLayout_25;
+    QLabel *label_24;
+    QLineEdit *maxRadius;
     QMenuBar *menuBar;
     QMenu *menu;
     QToolBar *mainToolBar;
@@ -741,6 +755,68 @@ public:
 
         verticalLayout_14->addWidget(removePlane);
 
+        groupBox_3 = new QGroupBox(tab_3);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setGeometry(QRect(10, 240, 261, 201));
+        layoutWidget8 = new QWidget(groupBox_3);
+        layoutWidget8->setObjectName(QStringLiteral("layoutWidget8"));
+        layoutWidget8->setGeometry(QRect(10, 90, 241, 100));
+        verticalLayout_15 = new QVBoxLayout(layoutWidget8);
+        verticalLayout_15->setSpacing(6);
+        verticalLayout_15->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_15->setObjectName(QStringLiteral("verticalLayout_15"));
+        verticalLayout_15->setContentsMargins(0, 0, 0, 0);
+        showOriginalPointCloud2 = new QPushButton(layoutWidget8);
+        showOriginalPointCloud2->setObjectName(QStringLiteral("showOriginalPointCloud2"));
+
+        verticalLayout_15->addWidget(showOriginalPointCloud2);
+
+        getCylinder = new QPushButton(layoutWidget8);
+        getCylinder->setObjectName(QStringLiteral("getCylinder"));
+
+        verticalLayout_15->addWidget(getCylinder);
+
+        removeCylinder = new QPushButton(layoutWidget8);
+        removeCylinder->setObjectName(QStringLiteral("removeCylinder"));
+
+        verticalLayout_15->addWidget(removeCylinder);
+
+        widget = new QWidget(groupBox_3);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(10, 30, 241, 23));
+        horizontalLayout_24 = new QHBoxLayout(widget);
+        horizontalLayout_24->setSpacing(6);
+        horizontalLayout_24->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_24->setObjectName(QStringLiteral("horizontalLayout_24"));
+        horizontalLayout_24->setContentsMargins(0, 0, 0, 0);
+        label_23 = new QLabel(widget);
+        label_23->setObjectName(QStringLiteral("label_23"));
+
+        horizontalLayout_24->addWidget(label_23);
+
+        minRadius = new QLineEdit(widget);
+        minRadius->setObjectName(QStringLiteral("minRadius"));
+
+        horizontalLayout_24->addWidget(minRadius);
+
+        widget1 = new QWidget(groupBox_3);
+        widget1->setObjectName(QStringLiteral("widget1"));
+        widget1->setGeometry(QRect(10, 60, 241, 23));
+        horizontalLayout_25 = new QHBoxLayout(widget1);
+        horizontalLayout_25->setSpacing(6);
+        horizontalLayout_25->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_25->setObjectName(QStringLiteral("horizontalLayout_25"));
+        horizontalLayout_25->setContentsMargins(0, 0, 0, 0);
+        label_24 = new QLabel(widget1);
+        label_24->setObjectName(QStringLiteral("label_24"));
+
+        horizontalLayout_25->addWidget(label_24);
+
+        maxRadius = new QLineEdit(widget1);
+        maxRadius->setObjectName(QStringLiteral("maxRadius"));
+
+        horizontalLayout_25->addWidget(maxRadius);
+
         tabWidget->addTab(tab_3, QString());
         QT_Show_PCDClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QT_Show_PCDClass);
@@ -761,7 +837,7 @@ public:
 
         retranslateUi(QT_Show_PCDClass);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(QT_Show_PCDClass);
@@ -819,6 +895,12 @@ public:
         showOriginalPointCloud->setText(QApplication::translate("QT_Show_PCDClass", "\346\230\276\347\244\272\345\216\237\347\202\271\344\272\221", Q_NULLPTR));
         getPlane->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\217\226\345\276\227\345\271\263\351\235\242", Q_NULLPTR));
         removePlane->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\216\273\351\231\244\345\271\263\351\235\242", Q_NULLPTR));
+        groupBox_3->setTitle(QApplication::translate("QT_Show_PCDClass", "\346\237\261\351\235\242\345\210\206\345\211\262", Q_NULLPTR));
+        showOriginalPointCloud2->setText(QApplication::translate("QT_Show_PCDClass", "\346\230\276\347\244\272\345\216\237\347\202\271\344\272\221", Q_NULLPTR));
+        getCylinder->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\217\226\345\276\227\346\237\261\351\235\242", Q_NULLPTR));
+        removeCylinder->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\216\273\351\231\244\346\237\261\351\235\242", Q_NULLPTR));
+        label_23->setText(QApplication::translate("QT_Show_PCDClass", "\346\234\200\345\260\217\345\215\212\345\276\204:", Q_NULLPTR));
+        label_24->setText(QApplication::translate("QT_Show_PCDClass", "\346\234\200\345\244\247\345\215\212\345\276\204:", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262", Q_NULLPTR));
         menu->setTitle(QApplication::translate("QT_Show_PCDClass", "\346\226\207\344\273\266", Q_NULLPTR));
     } // retranslateUi
