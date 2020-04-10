@@ -136,8 +136,6 @@ private slots:
 	void onPassThrough();
 	//统计滤波函数声明
 	void onStatisticalOutlierRemoval();
-	//分割程序声明
-	void cylinder_segmentation();
 	//保存PCD格式点云声明
 	void onSave();
 	//添加坐标系
@@ -156,4 +154,6 @@ private slots:
 	void getCylinder();
 	//移除柱面并显示
 	void removeCylinder();
+	//载入平面分割后点云
+	void loadPointCloudAfterPlane();
 };

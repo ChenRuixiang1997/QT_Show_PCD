@@ -33,7 +33,7 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	connect(ui.passThroughButton, SIGNAL(clicked()), this, SLOT(onPassThrough()));
 	//统计滤波
 	connect(ui.statisticalOutlierRemovalButton, SIGNAL(clicked()), this, SLOT(onStatisticalOutlierRemoval()));
-	//connect(ui.statisticalOutlierRemovalButton, SIGNAL(clicked()), this, SLOT(cylinder_segmentation()));
+	
 	//点云保存
 	connect(ui.saveAsPCD, SIGNAL(clicked()), this, SLOT(onSave()));
 	//显示分割前点云
@@ -47,6 +47,8 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	connect(ui.getCylinder, SIGNAL(clicked()), this, SLOT(getCylinder()));
 	//分割去除柱面点云并显示
 	connect(ui.removeCylinder, SIGNAL(clicked()), this, SLOT(removeCylinder()));
+	//载入平面分割后点云用于柱面分割
+	connect(ui.loadPointCloudAfterPlane, SIGNAL(clicked()), this, SLOT(loadPointCloudAfterPlane()));
 }
 
 //初始化VtkWidget
@@ -420,126 +422,6 @@ void QT_Show_PCD::onStatisticalOutlierRemoval()
 	cloud_save_ptr = cloud2_filtered_ptr;
 }
 
-//点云分割
-void QT_Show_PCD::cylinder_segmentation() 
-{
-	// 所有需要的对象
-	pcl::PCDReader reader;//读取点云
-	pcl::PassThrough<pcl::PointXYZ> pass;//直通滤波
-	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;//正态估计
-	pcl::SACSegmentationFromNormals<pcl::PointXYZ, pcl::Normal> seg;//点云分割
-	pcl::PCDWriter writer;//点云写出
-	pcl::ExtractIndices<pcl::PointXYZ> extract;//萃取指数
-	pcl::ExtractIndices<pcl::Normal> extract_normals;//萃取指数
-
-	// 数据集
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);//原始点云
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZ>);//点云过滤
-	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud<pcl::Normal>);//法线计算
-	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals2(new pcl::PointCloud<pcl::Normal>);//法线计算
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered2(new pcl::PointCloud<pcl::PointXYZ>);//点云过滤
-	pcl::ModelCoefficients::Ptr coefficients_plane(new pcl::ModelCoefficients), coefficients_cylinder(new pcl::ModelCoefficients);//平面系数
-	pcl::PointIndices::Ptr inliers_plane(new pcl::PointIndices), inliers_cylinder(new pcl::PointIndices);//平面内联
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());//kd树
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose The PointCloud TO VoxelGridFilter", ".", "Open PCD files(*.pcd)");
-
-	if (!fileName.isEmpty())
-	{
-		std::string file_name = fileName.toStdString();
-		// 读取点云数据
-		reader.read(file_name, *cloud);
-		
-		//-----cloud->points.size()此时点云数据量
-		// << "PointCloud has: " << cloud->points.size() << " data points." << std::endl;
-
-		// 直通滤波去除杂散nan点(z轴，去除1.5米外的点)
-		pass.setInputCloud(cloud);
-		pass.setFilterFieldName("z");
-		pass.setFilterLimits(0, 1.5);
-		pass.filter(*cloud_filtered);
-
-		//-----cloud_filtered->points.size()直通滤波后点云数据量
-		//std::cerr << "PointCloud after filtering has: " << cloud_filtered->points.size() << " data points." << std::endl;
-
-		// 计算点法线
-		ne.setSearchMethod(tree);//设置近邻搜索算法 
-		ne.setInputCloud(cloud_filtered);//设置输入点云
-		ne.setKSearch(50);//指定临近点数量
-		ne.compute(*cloud_normals);
-
-		// 为平面模型创建分割对象并设置所有参数
-		seg.setOptimizeCoefficients(true);//设置优化系数
-		seg.setModelType(pcl::SACMODEL_NORMAL_PLANE);//设置分割模型类别
-		seg.setNormalDistanceWeight(0.1);//设置法线距离权重
-		seg.setMethodType(pcl::SAC_RANSAC);//设置用哪个随机参数估计方法
-		seg.setMaxIterations(100);//设置最大迭代次数
-		seg.setDistanceThreshold(0.03);//设置距离阈值
-		seg.setInputCloud(cloud_filtered);//设置输入点云
-		seg.setInputNormals(cloud_normals);//设置输入法线
-		// 分割得到平面内联和系数
-		seg.segment(*inliers_plane, *coefficients_plane);//前者 平面内联 ， 后者 平面系数
-		//std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
-
-		// 将直通滤波后点云作为输入提取平面内联线
-		extract.setInputCloud(cloud_filtered);
-		extract.setIndices(inliers_plane);//设置索引
-		extract.setNegative(false);//设置是否应应用点过滤的常规条件或倒转条件。输入参数negative:false = 正常的过滤器行为（默认），true = 反向的行为。
-
-		// 将平面内联写入磁盘
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
-		extract.filter(*cloud_plane);
-		//提示一些信息
-		//std::cerr << "PointCloud representing the planar component: " << cloud_plane->points.size() << " data points." << std::endl;_plane
-		file_name.insert(file_name.find("."), "_plane");
-		writer.write(file_name, *cloud_plane, false);
-
-		//=====================================分割平面完成=========================================
-
-
-		// 移除平面内联，取出其余部分
-		extract.setNegative(true);//滤波条件取反，取出其余部分到cloud_filtered2
-		extract.filter(*cloud_filtered2);
-		//===========================================
-		extract_normals.setNegative(true);
-		extract_normals.setInputCloud(cloud_normals);
-		extract_normals.setIndices(inliers_plane);
-		extract_normals.filter(*cloud_normals2);
-
-		// 创建圆柱体分割的分割对象并设置所有参数
-		seg.setOptimizeCoefficients(true);
-		seg.setModelType(pcl::SACMODEL_CYLINDER);
-		seg.setMethodType(pcl::SAC_RANSAC);
-		seg.setNormalDistanceWeight(0.1);
-		seg.setMaxIterations(10000);
-		seg.setDistanceThreshold(0.05);
-		seg.setRadiusLimits(0, 0.1);//设置半径限制
-		seg.setInputCloud(cloud_filtered2);
-		seg.setInputNormals(cloud_normals2);
-
-		// 获得圆柱内腔和系数
-		seg.segment(*inliers_cylinder, *coefficients_cylinder);
-		//std::cerr << "Cylinder coefficients: " << *coefficients_cylinder << std::endl;
-
-		// 将柱面内联写入磁盘
-		extract.setInputCloud(cloud_filtered2);
-		extract.setIndices(inliers_cylinder);
-		extract.setNegative(false);
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cylinder(new pcl::PointCloud<pcl::PointXYZ>());
-		extract.filter(*cloud_cylinder);
-		if (cloud_cylinder->points.empty())
-		{
-			//std::cerr << "Can't find the cylindrical component." << std::endl;
-			QMessageBox::warning(this, "错误:", "找不到圆柱形组件");
-		}	
-		else
-		{
-			file_name.erase(file_name.find(".") - 6);
-			file_name.append("_cylinder.pcd");
-			writer.write(file_name, *cloud_cylinder, false);
-		}
-	}
-}
-
 //法线显示
 void QT_Show_PCD::onNormal()
 {
@@ -816,4 +698,16 @@ void QT_Show_PCD::removeCylinder()
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
 	cloud_save_ptr = cloud_without_cylinder;
+}
+
+//载入平面分割后点云用于柱面分割
+void QT_Show_PCD::loadPointCloudAfterPlane() 
+{
+	if (cloud_without_plane->width * cloud_without_plane->height == 0) 
+	{
+		QMessageBox::warning(this,"警告!","未找到去除平面后点云!");
+		return;
+	}
+	cloud = cloud_without_plane;
+	QMessageBox::information(this, "提示!", "去除平面后点云载入成功!");
 }

@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_QT_Show_PCD_t {
     QByteArrayData data[20];
-    char stringdata0[261];
+    char stringdata0[264];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,26 +39,25 @@ QT_MOC_LITERAL(6, 45, 8), // "setAxisZ"
 QT_MOC_LITERAL(7, 54, 17), // "setFilterNegative"
 QT_MOC_LITERAL(8, 72, 13), // "onPassThrough"
 QT_MOC_LITERAL(9, 86, 27), // "onStatisticalOutlierRemoval"
-QT_MOC_LITERAL(10, 114, 21), // "cylinder_segmentation"
-QT_MOC_LITERAL(11, 136, 6), // "onSave"
-QT_MOC_LITERAL(12, 143, 21), // "onAddCoordinateSystem"
-QT_MOC_LITERAL(13, 165, 8), // "onNormal"
-QT_MOC_LITERAL(14, 174, 15), // "onRemoveNormals"
-QT_MOC_LITERAL(15, 190, 22), // "showOriginalPointCloud"
-QT_MOC_LITERAL(16, 213, 8), // "getPlane"
-QT_MOC_LITERAL(17, 222, 11), // "removePlane"
-QT_MOC_LITERAL(18, 234, 11), // "getCylinder"
-QT_MOC_LITERAL(19, 246, 14) // "removeCylinder"
+QT_MOC_LITERAL(10, 114, 6), // "onSave"
+QT_MOC_LITERAL(11, 121, 21), // "onAddCoordinateSystem"
+QT_MOC_LITERAL(12, 143, 8), // "onNormal"
+QT_MOC_LITERAL(13, 152, 15), // "onRemoveNormals"
+QT_MOC_LITERAL(14, 168, 22), // "showOriginalPointCloud"
+QT_MOC_LITERAL(15, 191, 8), // "getPlane"
+QT_MOC_LITERAL(16, 200, 11), // "removePlane"
+QT_MOC_LITERAL(17, 212, 11), // "getCylinder"
+QT_MOC_LITERAL(18, 224, 14), // "removeCylinder"
+QT_MOC_LITERAL(19, 239, 24) // "loadPointCloudAfterPlane"
 
     },
     "QT_Show_PCD\0onOpen\0\0onVelx\0setAxisX\0"
     "setAxisY\0setAxisZ\0setFilterNegative\0"
     "onPassThrough\0onStatisticalOutlierRemoval\0"
-    "cylinder_segmentation\0onSave\0"
-    "onAddCoordinateSystem\0onNormal\0"
+    "onSave\0onAddCoordinateSystem\0onNormal\0"
     "onRemoveNormals\0showOriginalPointCloud\0"
     "getPlane\0removePlane\0getCylinder\0"
-    "removeCylinder"
+    "removeCylinder\0loadPointCloudAfterPlane"
 };
 #undef QT_MOC_LITERAL
 
@@ -132,16 +131,16 @@ void QT_Show_PCD::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 5: _t->setFilterNegative(); break;
         case 6: _t->onPassThrough(); break;
         case 7: _t->onStatisticalOutlierRemoval(); break;
-        case 8: _t->cylinder_segmentation(); break;
-        case 9: _t->onSave(); break;
-        case 10: _t->onAddCoordinateSystem(); break;
-        case 11: _t->onNormal(); break;
-        case 12: _t->onRemoveNormals(); break;
-        case 13: _t->showOriginalPointCloud(); break;
-        case 14: _t->getPlane(); break;
-        case 15: _t->removePlane(); break;
-        case 16: _t->getCylinder(); break;
-        case 17: _t->removeCylinder(); break;
+        case 8: _t->onSave(); break;
+        case 9: _t->onAddCoordinateSystem(); break;
+        case 10: _t->onNormal(); break;
+        case 11: _t->onRemoveNormals(); break;
+        case 12: _t->showOriginalPointCloud(); break;
+        case 13: _t->getPlane(); break;
+        case 14: _t->removePlane(); break;
+        case 15: _t->getCylinder(); break;
+        case 16: _t->removeCylinder(); break;
+        case 17: _t->loadPointCloudAfterPlane(); break;
         default: ;
         }
     }

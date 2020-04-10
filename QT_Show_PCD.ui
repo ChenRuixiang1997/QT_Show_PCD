@@ -714,46 +714,13 @@
         <x>10</x>
         <y>240</y>
         <width>261</width>
-        <height>201</height>
+        <height>231</height>
        </rect>
       </property>
       <property name="title">
        <string>柱面分割</string>
       </property>
       <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>241</width>
-         <height>100</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_15">
-        <item>
-         <widget class="QPushButton" name="showOriginalPointCloud2">
-          <property name="text">
-           <string>显示原点云</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="getCylinder">
-          <property name="text">
-           <string>分割取得柱面</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="removeCylinder">
-          <property name="text">
-           <string>分割去除柱面</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -775,7 +742,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -794,6 +761,46 @@
         </item>
         <item>
          <widget class="QLineEdit" name="maxRadius"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>90</y>
+         <width>241</width>
+         <height>135</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_15">
+        <item>
+         <widget class="QPushButton" name="loadPointCloudAfterPlane">
+          <property name="text">
+           <string>载入平面分割后点云</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="showOriginalPointCloud2">
+          <property name="text">
+           <string>显示原点云</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="getCylinder">
+          <property name="text">
+           <string>分割取得柱面</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeCylinder">
+          <property name="text">
+           <string>分割去除柱面</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
