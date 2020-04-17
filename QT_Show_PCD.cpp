@@ -5,6 +5,28 @@
 #pragma execution_character_set("utf-8")  
 #endif 
 
+//工具函数转换rs中的点云到pcl中的点云
+pcl::PointCloud<pcl::PointXYZ>::Ptr points_to_pcl(const rs2::points& points)
+{
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+
+	auto sp = points.get_profile().as<rs2::video_stream_profile>();
+	cloud->width = sp.width();
+	cloud->height = sp.height();
+	cloud->is_dense = false;
+	cloud->points.resize(points.size());
+	auto ptr = points.get_vertices();
+	for (auto& p : cloud->points)
+	{
+		p.x = ptr->x;
+		p.y = ptr->y;
+		p.z = ptr->z;
+		ptr++;
+	}
+
+	return cloud;
+}
+
 //构造函数
 QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	: QMainWindow(parent)
@@ -49,6 +71,10 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	connect(ui.removeCylinder, SIGNAL(clicked()), this, SLOT(removeCylinder()));
 	//载入平面分割后点云用于柱面分割
 	connect(ui.loadPointCloudAfterPlane, SIGNAL(clicked()), this, SLOT(loadPointCloudAfterPlane()));
+	//增加并显示新点云
+	connect(ui.addNewPointCloud, SIGNAL(clicked()), this, SLOT(addNewPointCloud()));
+	//相机采集数据
+	connect(ui.realSenceShowCloud, SIGNAL(clicked()), this, SLOT(realSenceShowCloud()));
 }
 
 //初始化VtkWidget
@@ -80,6 +106,8 @@ void QT_Show_PCD::initialVtkWidget()
 	ui.maxIterations->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 	//初始化点云
 	cloud.reset(new pcl::PointCloud<pcl::PointXYZ>);//初始点云
+	cloudA.reset(new pcl::PointCloud<pcl::PointXYZ>);//初始点云A
+	cloudB.reset(new pcl::PointCloud<pcl::PointXYZ>);//初始点云B
 	cloud_normals.reset(new pcl::PointCloud<pcl::Normal>);//法线
 	coefficients_plane.reset(new pcl::ModelCoefficients);//平面系数
 	inliers_plane.reset(new pcl::PointIndices);//平面内联
@@ -89,6 +117,14 @@ void QT_Show_PCD::initialVtkWidget()
 	inliers_cylinder.reset(new pcl::PointIndices);//柱面内联
 	cloud_cylinder.reset(new pcl::PointCloud<pcl::PointXYZ>());//柱面点云
 	cloud_without_cylinder.reset(new pcl::PointCloud<pcl::PointXYZ>());//去除平面的点云
+
+
+	//====================================================
+
+	//====================================================
+
+	//默认关闭摄像机
+	realSenceFlag = false;
 	//设置默认滤波方式为保留
 	setPassThoughNagative = false;
 	//默认未打开坐标系
@@ -119,6 +155,8 @@ void QT_Show_PCD::initialVtkWidget()
 	//初始化可视化窗口
 	viewer.reset(new pcl::visualization::PCLVisualizer("viewer", false));
 	viewer->addPointCloud(cloud, "cloud");
+	viewer->addPointCloud(cloudA, "cloudA");
+	viewer->addPointCloud(cloudB, "cloudB");
 	ui.qvtkWidget->SetRenderWindow(viewer->getRenderWindow());
 	viewer->setupInteractor(ui.qvtkWidget->GetInteractor(), ui.qvtkWidget->GetRenderWindow());
 	ui.qvtkWidget->update();
@@ -161,65 +199,6 @@ void QT_Show_PCD::onAddCoordinateSystem()
 	viewer->resetCamera();
 	ui.qvtkWidget->update();
 	
-}
-//打开并显示点云文件
-void QT_Show_PCD::onOpen()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, "Open PointCloud", ".", "Open PCD files(*.pcd)");
-	if (!fileName.isEmpty())
-	{
-		std::string file_name = fileName.toStdString();
-
-		//sensor_msgs::PointCloud2 cloud2;
-
-		pcl::PCLPointCloud2 cloud2;
-
-		//pcl::PointCloud<Eigen::MatrixXf> cloud2;
-
-		Eigen::Vector4f origin;
-		Eigen::Quaternionf orientation;
-		int pcd_version;
-		int data_type;
-		unsigned int data_idx;
-		int offset = 0;
-		//创建PCD读取对象
-		pcl::PCDReader rd;
-		//读取PCD头信息
-		rd.readHeader(file_name, cloud2, origin, orientation, pcd_version, data_type, data_idx);
-		if (data_type == 0 || data_type == 1)
-
-		{
-			pcl::io::loadPCDFile(fileName.toStdString(), *cloud);
-		}
-
-		else if (data_type == 2 )
-		{
-			pcl::PCDReader reader;
-			reader.read<pcl::PointXYZ>(fileName.toStdString(), *cloud);
-		}
-		viewer->updatePointCloud(cloud, "cloud");
-		viewer->resetCamera();
-		ui.qvtkWidget->update();
-	}
-}
-
-//点云保存
-void QT_Show_PCD::onSave()
-{
-	if (cloud_save_ptr == NULL)
-	{
-		QMessageBox::warning(this, "错误:", "输出数据为空!");
-		return;
-	}
-	QString saveFileName = QFileDialog::getSaveFileName(this, "保存点云", ".", "点云文件(*.pcd)");
-	if (!saveFileName.isEmpty())
-	{
-		saveFileNameStr = saveFileName.toStdString();
-		writer.write(saveFileNameStr, *cloud_save_ptr, false);
-		QMessageBox::information(this, "信息:", "保存成功!");
-		return;
-	}
-
 }
 
 //设置直通滤波轴向
@@ -507,16 +486,15 @@ void QT_Show_PCD::getPlane()
 	seg.setDistanceThreshold(distanceThreshold);//设置距离阈值
 	seg.setInputCloud(cloud);//设置输入点云
 	seg.setInputNormals(cloud_normals);//设置输入法线
-									   // 分割得到平面内联和系数
+	// 分割得到平面内联和系数
 	seg.segment(*inliers_plane, *coefficients_plane);//前者 平面内联 ， 后者 平面系数
 
-													 // 将直通滤波后点云作为输入提取平面内联线
+	// 将直通滤波后点云作为输入提取平面内联线
 	extract.setInputCloud(cloud);//设置输入点云
 	extract.setIndices(inliers_plane);//设置索引
 	extract.setNegative(false);//设置是否应应用点过滤的常规条件或倒转条件。输入参数negative:false = 正常的过滤器行为（默认），true = 反向的行为。
 
-							   // 将平面内联写入磁盘
-							   //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
+	// 将平面内联写入磁盘
 	extract.filter(*cloud_plane);
 
 	//显示点云
@@ -710,4 +688,169 @@ void QT_Show_PCD::loadPointCloudAfterPlane()
 	}
 	cloud = cloud_without_plane;
 	QMessageBox::information(this, "提示!", "去除平面后点云载入成功!");
+}
+
+//点云保存
+void QT_Show_PCD::onSave()
+{
+	cloud_save_ptr = cloud;
+	if (cloud_save_ptr->points.empty())
+	{
+		QMessageBox::warning(this, "错误:", "输出数据为空!");
+		return;
+	}
+	QString saveFileName = QFileDialog::getSaveFileName(this, "保存点云", ".", "点云文件(*.pcd)");
+	if (!saveFileName.isEmpty())
+	{
+		saveFileNameStr = saveFileName.toStdString();
+		writer.write(saveFileNameStr, *cloud_save_ptr, false);
+		QMessageBox::information(this, "信息:", "保存成功!");
+		return;
+	}
+
+}
+
+//打开并显示点云文件
+void QT_Show_PCD::onOpen()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "Open PointCloud", ".", "Open PCD OR PLY files(*.pcd *.ply)");
+	if (!fileName.isEmpty())
+	{
+		std::string file_name = fileName.toStdString();
+		if (file_name.substr(file_name.find("."),file_name.length()) == "ply")
+		{
+			pcl::PLYReader plyReader;
+			plyReader.read(file_name,*cloud);
+		}
+
+		pcl::PCLPointCloud2 cloud2;
+
+		Eigen::Vector4f origin;
+		Eigen::Quaternionf orientation;
+		int pcd_version;
+		int data_type;
+		unsigned int data_idx;
+		int offset = 0;
+		//创建PCD读取对象
+		pcl::PCDReader rd;
+		//读取PCD头信息
+		rd.readHeader(file_name, cloud2, origin, orientation, pcd_version, data_type, data_idx);
+		if (data_type == 0 || data_type == 1)
+
+		{
+			pcl::io::loadPCDFile(fileName.toStdString(), *cloud);
+		}
+
+		else if (data_type == 2)
+		{
+			pcl::PCDReader reader;
+			reader.read<pcl::PointXYZ>(fileName.toStdString(), *cloud);
+		}
+		viewer->updatePointCloud(cloud, "cloud");
+		viewer->resetCamera();
+	}
+}
+
+//加入新点云
+void QT_Show_PCD::addNewPointCloud() 
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "打开点云", ".", "Open PCD files(*.pcd)");
+	if (!fileName.isEmpty())
+	{
+		std::string file_name = fileName.toStdString();
+
+		pcl::PCLPointCloud2 cloud2;
+
+		Eigen::Vector4f origin;
+		Eigen::Quaternionf orientation;
+		int pcd_version;
+		int data_type;
+		unsigned int data_idx;
+		int offset = 0;
+		//创建PCD读取对象
+		pcl::PCDReader rd;
+		//读取PCD头信息
+		rd.readHeader(file_name, cloud2, origin, orientation, pcd_version, data_type, data_idx);
+		if (cloud->points.empty()) 
+		{
+			if (data_type == 0 || data_type == 1)
+			{
+				pcl::io::loadPCDFile(fileName.toStdString(), *cloud);
+			}
+			else if (data_type == 2)
+			{
+				pcl::PCDReader reader;
+				reader.read<pcl::PointXYZ>(fileName.toStdString(), *cloud);
+			}
+			viewer->updatePointCloud(cloud,"cloud");
+			viewer->resetCamera();
+			ui.qvtkWidget->update();
+		}
+		else if (cloudA->points.empty()) 
+		{
+			if (data_type == 0 || data_type == 1)
+			{
+				pcl::io::loadPCDFile(fileName.toStdString(), *cloudA);
+			}
+			else if (data_type == 2)
+			{
+				pcl::PCDReader reader;
+				reader.read<pcl::PointXYZ>(fileName.toStdString(), *cloudA);
+			}
+			//viewer->addPointCloud(cloudA, "cloudA");
+			viewer->updatePointCloud(cloudA, "cloudA");
+			viewer->resetCamera();
+			ui.qvtkWidget->update();
+		}
+		else if (cloudB->points.empty())
+		{
+			if (data_type == 0 || data_type == 1)
+			{
+				pcl::io::loadPCDFile(fileName.toStdString(), *cloudB);
+			}
+			else if (data_type == 2)
+			{
+				pcl::PCDReader reader;
+				reader.read<pcl::PointXYZ>(fileName.toStdString(), *cloudB);
+			}
+			//viewer->addPointCloud(cloudB, "cloudB");
+			viewer->updatePointCloud(cloudB, "cloudB");
+			viewer->resetCamera();
+			ui.qvtkWidget->update();
+		}
+		else 
+		{
+			QMessageBox::warning(this,"警告!","最多同时显示三个点云");
+		}
+	}
+}
+
+//点云实时显示
+void QT_Show_PCD::realSenceShowCloud() 
+{
+	//viewer->removeAllPointClouds();
+	realSenceFlag = !realSenceFlag;
+	pipe.start();
+	// 等待相机的下一组帧
+
+	auto frames = pipe.wait_for_frames();
+
+	auto color = frames.get_color_frame();
+	// 对于没有RGB传感器的相机，我们将把点云映射到红外而不是颜色
+	if (!color)
+	{
+		color = frames.get_infrared_frame();
+	}
+	// 告诉pointcloud对象映射到此颜色框架
+	pc.map_to(color);
+
+	auto depth = frames.get_depth_frame();
+	// 生成点云和纹理映射
+	points = pc.calculate(depth);
+
+	cloud = points_to_pcl(points);
+	viewer->updatePointCloud(cloud, "cloud");
+	//viewer->resetCamera();
+	ui.qvtkWidget->update();
+	pipe.stop();
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>866</width>
-    <height>607</height>
+    <width>857</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,9 +66,9 @@
    <widget class="QPushButton" name="saveAsPCD">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>760</x>
       <y>10</y>
-      <width>111</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -86,7 +86,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -603,6 +603,19 @@
        </item>
       </layout>
      </widget>
+     <widget class="QPushButton" name="realSenceShowCloud">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>360</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>相机</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -764,7 +777,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>11</x>
@@ -807,13 +820,26 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QPushButton" name="addNewPointCloud">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>10</y>
+      <width>93</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>加入新点云</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>866</width>
+     <width>857</width>
      <height>26</height>
     </rect>
    </property>

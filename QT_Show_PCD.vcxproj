@@ -47,6 +47,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PCL_Release.props" />
     <Import Project="QT.props" />
+    <Import Project="C:\Program Files (x86)\Intel RealSense SDK 2.0\intel.realsense.props" />
+    <Import Project="C:\Program Files (x86)\Intel RealSense SDK 2.0\opencv.props" />
+    <Import Project="C:\Program Files (x86)\Intel RealSense SDK 2.0\glfw-imgui.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">

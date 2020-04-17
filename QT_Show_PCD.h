@@ -16,6 +16,7 @@ VTK_MODULE_INIT(vtkInteractionStyle)
 #include <QtWidgets/QWidget>
 #include <vtkRenderWindow.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>//可视化
 #include <pcl/filters/voxel_grid.h>//体素格滤波器VoxelGrid
@@ -28,6 +29,9 @@ VTK_MODULE_INIT(vtkInteractionStyle)
 #include <pcl/sample_consensus/model_types.h>//样本一致性/模型类型
 #include <pcl/segmentation/sac_segmentation.h>//sac_分割
 #include <QMessageBox>//QT消息盒子
+#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API |包括RealSense跨平台API
+
+#include <algorithm>            // std::min, std::max
 
 
 class QT_Show_PCD : public QMainWindow
@@ -40,7 +44,9 @@ private:
 	Ui::QT_Show_PCDClass ui;
 
 	//创建公共对象
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;//用于可视化的点云					  
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;//用于可视化的点云
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudA;//用于可视化的点云A
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudB;//用于可视化的点云B
 	pcl::PCDWriter writer;//写出点云
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;//可视化
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_save_ptr;//用于保存点云
@@ -56,6 +62,22 @@ private:
 	pcl::PointIndices::Ptr inliers_cylinder;//平面分割得到的柱面内联
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cylinder;//柱面点云
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_cylinder;//去除平面得到的点云
+
+
+	//===========================================================================================
+	// Declare pointcloud object, for calculating pointclouds and texture mappings
+	// 声明pointcloud对象，用于计算pointclouds和纹理映射
+	rs2::pointcloud pc;
+	// We want the points object to be persistent so we can display the last cloud when a frame drops、
+	// 我们希望points对象是持久的，以便在帧下降时显示最后一个云
+	rs2::points points;
+
+	// Declare RealSense pipeline, encapsulating the actual device and sensors
+	// 声明RealSense管道，封装实际设备和传感器
+	rs2::pipeline pipe;
+
+	//===========================================================================================
+
 	//初始化组件
 	void initialVtkWidget();
 protected:
@@ -117,43 +139,31 @@ protected:
 	double minRadius;
 	QString QMaxRadius;//柱面分割最大半径
 	double maxRadius;
+
+	bool realSenceFlag;//打开/关闭摄像机
+
+
 	//声明槽函数
 private slots:
-	//打开文件
-	void onOpen();
-	//下采样函数声明
-	void onVelx();
-	//直通滤波函数声明
-	//设置滤波轴向X
-	void setAxisX();
-	//设置滤波轴向Y
-	void setAxisY();
-	//设置滤波轴向Z
-	void setAxisZ();
-	//设置反向
-	void setFilterNegative();
-	//滤波实现
-	void onPassThrough();
-	//统计滤波函数声明
-	void onStatisticalOutlierRemoval();
-	//保存PCD格式点云声明
-	void onSave();
-	//添加坐标系
-	void onAddCoordinateSystem();
-	//当前点云计算法线并显示
-	void onNormal();
-	//移除法线
-	void onRemoveNormals();
-	//显示分割前点云
-	void showOriginalPointCloud();
-	//分割得到平面并显示
-	void getPlane();
-	//分割得到平面并显示
-	void removePlane();
-	//分割得到柱面并显示
-	void getCylinder();
-	//移除柱面并显示
-	void removeCylinder();
-	//载入平面分割后点云
-	void loadPointCloudAfterPlane();
+	void onOpen();//打开文件	
+	void onVelx();//下采样函数声明
+	//直通滤波函数声明	
+	void setAxisX();//设置滤波轴向X	
+	void setAxisY();//设置滤波轴向Y	
+	void setAxisZ();//设置滤波轴向Z	
+	void setFilterNegative();//设置反向	
+	void onPassThrough();//滤波实现	
+	void onStatisticalOutlierRemoval();//统计滤波函数声明	
+	void onSave();//保存PCD格式点云声明	
+	void onAddCoordinateSystem();//添加坐标系
+	void onNormal();//当前点云计算法线并显示
+	void onRemoveNormals();//移除法线
+	void showOriginalPointCloud();//显示分割前点云
+	void getPlane();//分割得到平面并显示
+	void removePlane();//分割得到平面并显示
+	void getCylinder();//分割得到柱面并显示
+	void removeCylinder();//移除柱面并显示
+	void loadPointCloudAfterPlane();//载入平面分割后点云
+	void addNewPointCloud();//加入新点云
+	void realSenceShowCloud();//显示realsence SR300采集点云
 };
