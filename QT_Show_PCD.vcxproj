@@ -50,6 +50,7 @@
     <Import Project="C:\Program Files (x86)\Intel RealSense SDK 2.0\intel.realsense.props" />
     <Import Project="C:\Program Files (x86)\Intel RealSense SDK 2.0\opencv.props" />
     <Import Project="C:\Program Files (x86)\Intel RealSense SDK 2.0\glfw-imgui.props" />
+    <Import Project="realsence_sample.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">

@@ -4,6 +4,7 @@
 #include "ui_QT_Show_PCD.h"
 
 
+
 #ifndef INITIAL_OPENGL
 #define INITIAL_OPENGL
 #include <vtkAutoInit.h>
@@ -28,10 +29,13 @@ VTK_MODULE_INIT(vtkInteractionStyle)
 #include <pcl/sample_consensus/method_types.h>//样本一致性/方法类型
 #include <pcl/sample_consensus/model_types.h>//样本一致性/模型类型
 #include <pcl/segmentation/sac_segmentation.h>//sac_分割
+#include <pcl/segmentation/region_growing.h>//区域增长点云分割算法
 #include <QMessageBox>//QT消息盒子
-#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API |包括RealSense跨平台API
+#include <QProcess>//QT进程
 
+#include <librealsense2/rs.hpp>
 #include <algorithm>            // std::min, std::max
+
 
 
 class QT_Show_PCD : public QMainWindow
@@ -77,7 +81,7 @@ private:
 	rs2::pipeline pipe;
 
 	//===========================================================================================
-
+	
 	//初始化组件
 	void initialVtkWidget();
 protected:
@@ -139,9 +143,13 @@ protected:
 	double minRadius;
 	QString QMaxRadius;//柱面分割最大半径
 	double maxRadius;
-
-	bool realSenceFlag;//打开/关闭摄像机
-
+	//RGB彩色信息调节
+	QString RPercent;//红色信息比率
+	double rPercent;
+	QString GPercent;//蓝色信息比率
+	double gPercent;
+	QString BPercent;//绿色信息比率
+	double bPercent;
 
 	//声明槽函数
 private slots:
@@ -166,4 +174,6 @@ private slots:
 	void loadPointCloudAfterPlane();//载入平面分割后点云
 	void addNewPointCloud();//加入新点云
 	void realSenceShowCloud();//显示realsence SR300采集点云
+	void morphologicalFilter();//形态学滤波提取地面
+	void getPointCloudOneFrame();//获取单帧彩色点云
 };

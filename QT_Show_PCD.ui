@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
+    <width>859</width>
     <height>606</height>
    </rect>
   </property>
@@ -86,7 +86,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -603,17 +603,17 @@
        </item>
       </layout>
      </widget>
-     <widget class="QPushButton" name="realSenceShowCloud">
+     <widget class="QPushButton" name="morphologicalFilter">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>360</y>
-        <width>93</width>
+        <y>350</y>
+        <width>121</width>
         <height>28</height>
        </rect>
       </property>
       <property name="text">
-       <string>相机</string>
+       <string>法线与曲率分割</string>
       </property>
      </widget>
     </widget>
@@ -819,6 +819,107 @@
       </widget>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>相机与色彩平衡</string>
+     </attribute>
+     <widget class="QPushButton" name="realSenceShowCloud">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>251</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>相机</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>251</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>色彩平衡调整与截取点云</string>
+      </property>
+      <widget class="QPushButton" name="getPointCloudOneFrame">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>20</y>
+         <width>41</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>截
+取
+点
+云</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>20</y>
+         <width>191</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_16">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_26">
+          <item>
+           <widget class="QLabel" name="label_25">
+            <property name="text">
+             <string>R(0-100):</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="r_percent"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_27">
+          <item>
+           <widget class="QLabel" name="label_26">
+            <property name="text">
+             <string>G(0-100):</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="g_percent"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_28">
+          <item>
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>B(0-100):</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="b_percent"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
    </widget>
    <widget class="QPushButton" name="addNewPointCloud">
     <property name="geometry">
@@ -839,7 +940,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>857</width>
+     <width>859</width>
      <height>26</height>
     </rect>
    </property>

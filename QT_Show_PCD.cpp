@@ -19,8 +19,8 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr points_to_pcl(const rs2::points& points)
 	for (auto& p : cloud->points)
 	{
 		p.x = ptr->x;
-		p.y = ptr->y;
-		p.z = ptr->z;
+		p.y = - ptr->y;
+		p.z = - ptr->z;
 		ptr++;
 	}
 
@@ -75,6 +75,10 @@ QT_Show_PCD::QT_Show_PCD(QWidget *parent)
 	connect(ui.addNewPointCloud, SIGNAL(clicked()), this, SLOT(addNewPointCloud()));
 	//相机采集数据
 	connect(ui.realSenceShowCloud, SIGNAL(clicked()), this, SLOT(realSenceShowCloud()));
+	//获取一帧彩色点云
+	connect(ui.getPointCloudOneFrame, SIGNAL(clicked()), this, SLOT(getPointCloudOneFrame()));
+	//形态学滤波
+	connect(ui.morphologicalFilter, SIGNAL(clicked()), this, SLOT(morphologicalFilter()));
 }
 
 //初始化VtkWidget
@@ -98,6 +102,11 @@ void QT_Show_PCD::initialVtkWidget()
 	ui.minRadius->setValidator(doubleValidator);
 	ui.maxRadius->setValidator(doubleValidator);
 
+
+	ui.r_percent->setValidator(doubleValidator);
+	ui.g_percent->setValidator(doubleValidator);
+	ui.b_percent->setValidator(doubleValidator);
+
 	ui.nearPointNum->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));//指定输入框输入整数
 	ui.normalLevel->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 	ui.kSearch->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
@@ -118,13 +127,6 @@ void QT_Show_PCD::initialVtkWidget()
 	cloud_cylinder.reset(new pcl::PointCloud<pcl::PointXYZ>());//柱面点云
 	cloud_without_cylinder.reset(new pcl::PointCloud<pcl::PointXYZ>());//去除平面的点云
 
-
-	//====================================================
-
-	//====================================================
-
-	//默认关闭摄像机
-	realSenceFlag = false;
 	//设置默认滤波方式为保留
 	setPassThoughNagative = false;
 	//默认未打开坐标系
@@ -152,6 +154,11 @@ void QT_Show_PCD::initialVtkWidget()
 	//柱面分割半径范围初始化
 	minRadius = 0;
 	maxRadius = 0.1;
+	//初始化RGB平衡比率
+	rPercent = 1.0;
+	gPercent = 1.0;
+	bPercent = 1.0;
+
 	//初始化可视化窗口
 	viewer.reset(new pcl::visualization::PCLVisualizer("viewer", false));
 	viewer->addPointCloud(cloud, "cloud");
@@ -690,6 +697,43 @@ void QT_Show_PCD::loadPointCloudAfterPlane()
 	QMessageBox::information(this, "提示!", "去除平面后点云载入成功!");
 }
 
+//曲率与法线分割
+void QT_Show_PCD::morphologicalFilter()
+{
+	if (cloud_normals->empty())
+	{
+		QMessageBox::warning(this, "警告!", "请先生成法线！");
+		return;
+	}
+	//设置搜索的方式或者说是结构　kd树　搜索
+	pcl::search::Search<pcl::PointXYZ>::Ptr tree = boost::shared_ptr<pcl::search::Search<pcl::PointXYZ> >(new pcl::search::KdTree<pcl::PointXYZ>);
+	//区域增长聚类分割对象　<点，法线>
+	pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> reg;
+	reg.setMinClusterSize(50);     //最小的聚类的点数
+	reg.setMaxClusterSize(1000000);//最大的聚类的点数
+	reg.setSearchMethod(tree);     //搜索方式
+	reg.setNumberOfNeighbours(30); //设置搜索的邻域点的个数
+	reg.setInputCloud(cloud);      //输入点
+								   //reg.setIndices (indices);
+	reg.setInputNormals(cloud_normals);  //输入的法线
+	reg.setSmoothnessThreshold(3.0 / 180.0 * M_PI);//设置平滑度 法线差值阈值
+	reg.setCurvatureThreshold(1.0);                //设置曲率的阀值
+
+	std::vector <pcl::PointIndices> clusters;
+	reg.extract(clusters);//提取点的索引
+
+	pcl::PointCloud <pcl::PointXYZRGB>::Ptr colored_cloud = reg.getColoredCloud();
+
+
+
+	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(colored_cloud);
+
+	viewer->addPointCloud<pcl::PointXYZRGB>(colored_cloud, "sample cloud");
+	viewer->removePointCloud("cloud");
+	viewer->resetCamera();
+	ui.qvtkWidget->update();
+}
+
 //点云保存
 void QT_Show_PCD::onSave()
 {
@@ -717,10 +761,20 @@ void QT_Show_PCD::onOpen()
 	if (!fileName.isEmpty())
 	{
 		std::string file_name = fileName.toStdString();
-		if (file_name.substr(file_name.find("."),file_name.length()) == "ply")
+		if (file_name.substr(file_name.find("."),file_name.length()) == ".ply")
 		{
+			pcl::PCLPointCloud2 ply_cloud2;
 			pcl::PLYReader plyReader;
-			plyReader.read(file_name,*cloud);
+			plyReader.read(file_name, ply_cloud2);
+			pcl::PointCloud<pcl::PointXYZRGB> ply_point_cloud;
+			pcl::fromPCLPointCloud2(ply_cloud2, ply_point_cloud);
+			pcl::PCDWriter writer;
+			//======================== 这里 ===========================
+			writer.writeASCII("dataAAA.pcd", ply_point_cloud);
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr ply_ptr(new pcl::PointCloud<pcl::PointXYZRGB>);
+			pcl::PCDReader reader;
+			reader.read<pcl::PointXYZRGB>("dataAAA.pcd", *ply_ptr);
+			viewer->addPointCloud(ply_ptr,"ply_point_cloud");
 		}
 
 		pcl::PCLPointCloud2 cloud2;
@@ -825,32 +879,129 @@ void QT_Show_PCD::addNewPointCloud()
 	}
 }
 
-//点云实时显示
-void QT_Show_PCD::realSenceShowCloud() 
+//点云采集显示
+//void QT_Show_PCD::realSenceShowCloud() 
+//{
+//	QString path = "./rs-pointcloud.exe";
+//	QProcess *process = new QProcess;
+//	process->execute("\"" + path + "\"");
+//
+//	//viewer->removeAllPointClouds();
+//	realSenceFlag = !realSenceFlag;
+//	pipe.start();
+//	// 等待相机的下一组帧
+//	auto frames = pipe.wait_for_frames();
+//
+//	auto color = frames.get_color_frame();
+//	// 对于没有RGB传感器的相机，我们将把点云映射到红外而不是颜色
+//	if (!color)
+//	{
+//		color = frames.get_infrared_frame();
+//	}
+//	// 告诉pointcloud对象映射到此颜色框架
+//	pc.map_to(color);
+//
+//	auto depth = frames.get_depth_frame();
+//	// 生成点云和纹理映射
+//	points = pc.calculate(depth);
+//
+//	cloud = points_to_pcl(points);
+//	
+//	pipe.stop();
+//
+//	viewer->removeAllPointClouds();
+//	viewer->addPointCloud(cloud, "cloud");
+//	viewer->resetCamera();
+//	ui.qvtkWidget->update();
+//	cloud_save_ptr = cloud;
+//	
+//}
+
+void QT_Show_PCD::realSenceShowCloud()
 {
-	//viewer->removeAllPointClouds();
-	realSenceFlag = !realSenceFlag;
-	pipe.start();
-	// 等待相机的下一组帧
 
-	auto frames = pipe.wait_for_frames();
+	QString path = "./rs-pointcloud.exe";
 
-	auto color = frames.get_color_frame();
-	// 对于没有RGB传感器的相机，我们将把点云映射到红外而不是颜色
-	if (!color)
+
+	QProcess *process = new QProcess;
+
+	process->execute("\"" + path + "\"");
+	
+}
+
+void QT_Show_PCD::getPointCloudOneFrame()
+{
+	RPercent = ui.r_percent->text();
+	GPercent = ui.b_percent->text();
+	BPercent = ui.b_percent->text();
+	if (!RPercent.isEmpty())
 	{
-		color = frames.get_infrared_frame();
+		rPercent = RPercent.toDouble();
 	}
-	// 告诉pointcloud对象映射到此颜色框架
-	pc.map_to(color);
+	if (!GPercent.isEmpty())
+	{
+		gPercent = GPercent.toDouble();
+	}
+	if (!BPercent.isEmpty())
+	{
+		bPercent = BPercent.toDouble();
+	}
+	uint32_t depth_width = 1280;
+	uint32_t depth_height = 720;
+	uint32_t depth_fps = 30;
 
+	// 设置设备配置
+	rs2::config config;
+	config.enable_stream(rs2_stream::RS2_STREAM_DEPTH, depth_width, depth_height, rs2_format::RS2_FORMAT_Z16, depth_fps);
+
+	// 创建点云
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cam1;
+
+	//共享指针
+	cloud_cam1 = boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+	cloud_cam1->width = static_cast<uint32_t>(depth_width);
+	cloud_cam1->height = static_cast<uint32_t>(depth_height);
+	cloud_cam1->points.resize(cloud_cam1->height * cloud_cam1->width);
+	cloud_cam1->is_dense = false;
+
+	pipe.start();
+
+	//=======================
+	// 等待相机的下一组帧
+	auto frames = pipe.wait_for_frames();
 	auto depth = frames.get_depth_frame();
 	// 生成点云和纹理映射
 	points = pc.calculate(depth);
-
 	cloud = points_to_pcl(points);
-	viewer->updatePointCloud(cloud, "cloud");
-	//viewer->resetCamera();
+
+	//	获取彩色数据
+	rs2::align align(RS2_STREAM_DEPTH);
+	auto aligned_frames = align.process(frames);
+	rs2::video_frame color_frame = aligned_frames.get_color_frame();
+	auto p_color_frame = static_cast<uint8_t*>(const_cast<void*>(color_frame.get_data()));
+	uint32_t color_width = color_frame.as<rs2::video_frame>().get_width();
+	uint32_t color_height = color_frame.as<rs2::video_frame>().get_height();
+
+
+	//	填充点云
+	int j = 0;
+	for (int i = 0; i < color_width * color_height; i++) {
+		cloud_cam1->points[i].x = cloud->points[i].x;
+		cloud_cam1->points[i].y = cloud->points[i].y;
+		cloud_cam1->points[i].z = cloud->points[i].z;
+		cloud_cam1->points[i].g = p_color_frame[j] * gPercent;
+		cloud_cam1->points[i].b = p_color_frame[j + 1] * bPercent;
+		cloud_cam1->points[i].r = p_color_frame[j + 2] * rPercent;
+		j = j + 3;
+	}
+	//	在PCL查看器上显示结果
+	if (!viewer->updatePointCloud(cloud_cam1, "cloud1")) {
+		viewer->addPointCloud(cloud_cam1, "cloud1");
+	}
+
+	viewer->resetCamera();
+	//=======================
+
 	ui.qvtkWidget->update();
 	pipe.stop();
 }

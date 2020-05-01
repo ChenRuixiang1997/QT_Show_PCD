@@ -138,7 +138,7 @@ public:
     QHBoxLayout *horizontalLayout_21;
     QLabel *label_19;
     QLineEdit *coordinateSystemViewPort;
-    QPushButton *realSenceShowCloud;
+    QPushButton *morphologicalFilter;
     QWidget *tab_3;
     QGroupBox *groupBox_2;
     QWidget *layoutWidget6;
@@ -172,6 +172,21 @@ public:
     QPushButton *showOriginalPointCloud2;
     QPushButton *getCylinder;
     QPushButton *removeCylinder;
+    QWidget *tab_4;
+    QPushButton *realSenceShowCloud;
+    QGroupBox *groupBox_4;
+    QPushButton *getPointCloudOneFrame;
+    QWidget *widget;
+    QVBoxLayout *verticalLayout_16;
+    QHBoxLayout *horizontalLayout_26;
+    QLabel *label_25;
+    QLineEdit *r_percent;
+    QHBoxLayout *horizontalLayout_27;
+    QLabel *label_26;
+    QLineEdit *g_percent;
+    QHBoxLayout *horizontalLayout_28;
+    QLabel *label_27;
+    QLineEdit *b_percent;
     QPushButton *addNewPointCloud;
     QMenuBar *menuBar;
     QMenu *menu;
@@ -182,7 +197,7 @@ public:
     {
         if (QT_Show_PCDClass->objectName().isEmpty())
             QT_Show_PCDClass->setObjectName(QStringLiteral("QT_Show_PCDClass"));
-        QT_Show_PCDClass->resize(857, 606);
+        QT_Show_PCDClass->resize(859, 606);
         actionOpen = new QAction(QT_Show_PCDClass);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         voxelGridButton = new QAction(QT_Show_PCDClass);
@@ -673,9 +688,9 @@ public:
 
         verticalLayout_12->addLayout(verticalLayout_11);
 
-        realSenceShowCloud = new QPushButton(tab_2);
-        realSenceShowCloud->setObjectName(QStringLiteral("realSenceShowCloud"));
-        realSenceShowCloud->setGeometry(QRect(10, 360, 93, 28));
+        morphologicalFilter = new QPushButton(tab_2);
+        morphologicalFilter->setObjectName(QStringLiteral("morphologicalFilter"));
+        morphologicalFilter->setGeometry(QRect(10, 350, 121, 28));
         tabWidget->addTab(tab_2, QString());
         tab_3 = new QWidget();
         tab_3->setObjectName(QStringLiteral("tab_3"));
@@ -829,13 +844,81 @@ public:
         verticalLayout_15->addWidget(removeCylinder);
 
         tabWidget->addTab(tab_3, QString());
+        tab_4 = new QWidget();
+        tab_4->setObjectName(QStringLiteral("tab_4"));
+        realSenceShowCloud = new QPushButton(tab_4);
+        realSenceShowCloud->setObjectName(QStringLiteral("realSenceShowCloud"));
+        realSenceShowCloud->setGeometry(QRect(10, 20, 251, 28));
+        groupBox_4 = new QGroupBox(tab_4);
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        groupBox_4->setGeometry(QRect(10, 60, 251, 151));
+        getPointCloudOneFrame = new QPushButton(groupBox_4);
+        getPointCloudOneFrame->setObjectName(QStringLiteral("getPointCloudOneFrame"));
+        getPointCloudOneFrame->setGeometry(QRect(0, 20, 41, 121));
+        widget = new QWidget(groupBox_4);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(60, 20, 191, 121));
+        verticalLayout_16 = new QVBoxLayout(widget);
+        verticalLayout_16->setSpacing(6);
+        verticalLayout_16->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_16->setObjectName(QStringLiteral("verticalLayout_16"));
+        verticalLayout_16->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_26 = new QHBoxLayout();
+        horizontalLayout_26->setSpacing(6);
+        horizontalLayout_26->setObjectName(QStringLiteral("horizontalLayout_26"));
+        label_25 = new QLabel(widget);
+        label_25->setObjectName(QStringLiteral("label_25"));
+
+        horizontalLayout_26->addWidget(label_25);
+
+        r_percent = new QLineEdit(widget);
+        r_percent->setObjectName(QStringLiteral("r_percent"));
+
+        horizontalLayout_26->addWidget(r_percent);
+
+
+        verticalLayout_16->addLayout(horizontalLayout_26);
+
+        horizontalLayout_27 = new QHBoxLayout();
+        horizontalLayout_27->setSpacing(6);
+        horizontalLayout_27->setObjectName(QStringLiteral("horizontalLayout_27"));
+        label_26 = new QLabel(widget);
+        label_26->setObjectName(QStringLiteral("label_26"));
+
+        horizontalLayout_27->addWidget(label_26);
+
+        g_percent = new QLineEdit(widget);
+        g_percent->setObjectName(QStringLiteral("g_percent"));
+
+        horizontalLayout_27->addWidget(g_percent);
+
+
+        verticalLayout_16->addLayout(horizontalLayout_27);
+
+        horizontalLayout_28 = new QHBoxLayout();
+        horizontalLayout_28->setSpacing(6);
+        horizontalLayout_28->setObjectName(QStringLiteral("horizontalLayout_28"));
+        label_27 = new QLabel(widget);
+        label_27->setObjectName(QStringLiteral("label_27"));
+
+        horizontalLayout_28->addWidget(label_27);
+
+        b_percent = new QLineEdit(widget);
+        b_percent->setObjectName(QStringLiteral("b_percent"));
+
+        horizontalLayout_28->addWidget(b_percent);
+
+
+        verticalLayout_16->addLayout(horizontalLayout_28);
+
+        tabWidget->addTab(tab_4, QString());
         addNewPointCloud = new QPushButton(centralWidget);
         addNewPointCloud->setObjectName(QStringLiteral("addNewPointCloud"));
         addNewPointCloud->setGeometry(QRect(660, 10, 93, 21));
         QT_Show_PCDClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QT_Show_PCDClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 857, 26));
+        menuBar->setGeometry(QRect(0, 0, 859, 26));
         menu = new QMenu(menuBar);
         menu->setObjectName(QStringLiteral("menu"));
         QT_Show_PCDClass->setMenuBar(menuBar);
@@ -851,7 +934,7 @@ public:
 
         retranslateUi(QT_Show_PCDClass);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(QT_Show_PCDClass);
@@ -901,7 +984,7 @@ public:
         label_17->setText(QApplication::translate("QT_Show_PCDClass", "\345\235\220\346\240\207\347\263\273Y\344\275\215\347\275\256:", Q_NULLPTR));
         label_18->setText(QApplication::translate("QT_Show_PCDClass", "\345\235\220\346\240\207\347\263\273Z\344\275\215\347\275\256:", Q_NULLPTR));
         label_19->setText(QApplication::translate("QT_Show_PCDClass", "\345\235\220\346\240\207\347\263\273\350\247\206\347\202\271:", Q_NULLPTR));
-        realSenceShowCloud->setText(QApplication::translate("QT_Show_PCDClass", "\347\233\270\346\234\272", Q_NULLPTR));
+        morphologicalFilter->setText(QApplication::translate("QT_Show_PCDClass", "\346\263\225\347\272\277\344\270\216\346\233\262\347\216\207\345\210\206\345\211\262", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("QT_Show_PCDClass", "\346\263\225\347\272\277\344\270\216\345\235\220\346\240\207\347\263\273", Q_NULLPTR));
         groupBox_2->setTitle(QApplication::translate("QT_Show_PCDClass", "\345\271\263\351\235\242\345\210\206\345\211\262", Q_NULLPTR));
         label_20->setText(QApplication::translate("QT_Show_PCDClass", "\346\263\225\347\272\277\350\267\235\347\246\273\346\235\203\351\207\215:", Q_NULLPTR));
@@ -918,6 +1001,16 @@ public:
         getCylinder->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\217\226\345\276\227\346\237\261\351\235\242", Q_NULLPTR));
         removeCylinder->setText(QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262\345\216\273\351\231\244\346\237\261\351\235\242", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("QT_Show_PCDClass", "\345\210\206\345\211\262", Q_NULLPTR));
+        realSenceShowCloud->setText(QApplication::translate("QT_Show_PCDClass", "\347\233\270\346\234\272", Q_NULLPTR));
+        groupBox_4->setTitle(QApplication::translate("QT_Show_PCDClass", "\350\211\262\345\275\251\345\271\263\350\241\241\350\260\203\346\225\264\344\270\216\346\210\252\345\217\226\347\202\271\344\272\221", Q_NULLPTR));
+        getPointCloudOneFrame->setText(QApplication::translate("QT_Show_PCDClass", "\346\210\252\n"
+"\345\217\226\n"
+"\347\202\271\n"
+"\344\272\221", Q_NULLPTR));
+        label_25->setText(QApplication::translate("QT_Show_PCDClass", "R(0-100):", Q_NULLPTR));
+        label_26->setText(QApplication::translate("QT_Show_PCDClass", "G(0-100):", Q_NULLPTR));
+        label_27->setText(QApplication::translate("QT_Show_PCDClass", "B(0-100):", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("QT_Show_PCDClass", "\347\233\270\346\234\272\344\270\216\350\211\262\345\275\251\345\271\263\350\241\241", Q_NULLPTR));
         addNewPointCloud->setText(QApplication::translate("QT_Show_PCDClass", "\345\212\240\345\205\245\346\226\260\347\202\271\344\272\221", Q_NULLPTR));
         menu->setTitle(QApplication::translate("QT_Show_PCDClass", "\346\226\207\344\273\266", Q_NULLPTR));
     } // retranslateUi
